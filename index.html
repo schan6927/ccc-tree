@@ -191,7 +191,8 @@ mark { background: #fefcbf; border-radius: 2px; padding: 0 2px; }
     </div>
     <div class="step">
       <div class="step-num">3</div>
-      <div class="step-text">각 시트 첫 번째 행(헤더): <code>이름</code> · <code>나를 이끈 사람</code> · <code>학과</code> · <code>학년</code> · <code>성별</code> · <code>학번</code> · <code>연락처</code> · <code>레벨</code> · <code>가족순</code> · <code>CCC가입시기</code></div>
+      <div class="step-text">각 시트 첫 번째 행(헤더): <code>이름</code> · <code>부모 순장</code> · <code>학과</code> · <code>학년</code> · <code>학번</code> · <code>연락처</code> · <code>레벨</code> · <code>가족순</code> · <code>CCC가입시기</code><br>
+        <span style="color:#68d391">✓ 성별은 시트 이름(형제/자매)에서 자동 감지돼요</span></div>
     </div>
 
     <input class="url-input" type="text" id="sheetUrlInput" placeholder="Google Sheets URL 붙여넣기...">
@@ -329,7 +330,7 @@ async function loadData(forceRefresh = false) {
     const errors = [];
     results.forEach((r, i) => {
       if (r.status === 'fulfilled') {
-        parseSheetData(r.value);  // allMembers에 누적
+        parseSheetData(r.value, sheets[i]);  // allMembers에 누적
       } else {
         errors.push(`${sheets[i]}: ${r.reason.message}`);
       }
@@ -366,15 +367,20 @@ async function loadData(forceRefresh = false) {
 }
 
 // ══ 시트 파싱 ═══════════════════════════════════════════════════════════════
-function parseSheetData(table) {
+function parseSheetData(table, sheetName) {
+  // 시트 이름으로 성별 자동 감지
+  const autoGender = sheetName?.includes('형제') ? 'M'
+                   : sheetName?.includes('자매') ? 'F'
+                   : '';
+
   // 헤더 인덱스 찾기
   const cols = table.cols.map(c => c.label.trim());
   const idx = name => cols.indexOf(name);
-  
+
   // 컬럼 매핑 (유연하게 - 없으면 -1)
   const C = {
     name:    idx('이름'),
-    parent:  idx('나를 이끈 사람'),
+    parent:  idx('부모 순장'),
     dept:    idx('학과'),
     grade:   idx('학년'),
     gender:  idx('성별'),
@@ -415,7 +421,7 @@ function parseSheetData(table) {
       name: cleanN || name,
       dept: cell(row, C.dept),
       grade: cell(row, C.grade),
-      gender: cell(row, C.gender),
+      gender: cell(row, C.gender) || autoGender,
       studentYear: cell(row, C.year),
       phone: cell(row, C.phone),
       level: cell(row, C.level) || 'Member',
@@ -613,7 +619,7 @@ function showDetail(id) {
     ['가족순', m.familyGroup||'-'],
     ['CCC 가입', m.joined||'-'],
     ['영접 시기', m.salvation||'-'],
-    ['나를 이끈 사람', m.parent
+    ['부모 순장', m.parent
       ? `<span style="color:${parentM?'#4299e1':'inherit'};cursor:${parentM?'pointer':'default'}" ${parentM?`onclick="jumpTo('${m.parent.replace(/'/g,"\\'")}')"`:''}>${m.parent}</span>`
       : '-'],
   ];
