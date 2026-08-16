@@ -17,14 +17,15 @@ body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-ser
 }
 .setup-card {
   background: white; border-radius: 16px; padding: 36px 40px;
-  max-width: 520px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  max-width: 540px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.25);
 }
 .setup-card h2 { font-size: 1.3rem; color: #1a365d; margin-bottom: 8px; }
 .setup-card p { font-size: .88rem; color: #718096; line-height: 1.6; margin-bottom: 18px; }
 .step { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
 .step-num { width: 24px; height: 24px; border-radius: 50%; background: #2b6cb0; color: white; font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-.step-text { font-size: .85rem; color: #4a5568; line-height: 1.6; }
+.step-text { font-size: .85rem; color: #4a5568; line-height: 1.7; }
 .step-text code { background: #edf2f7; padding: 1px 5px; border-radius: 4px; font-size: .82rem; color: #2d3748; }
+.step-text .ok { color: #38a169; font-size: .8rem; }
 .url-input { width: 100%; padding: 10px 14px; border: 1.5px solid #cbd5e0; border-radius: 8px; font-size: .88rem; outline: none; margin-top: 18px; }
 .url-input:focus { border-color: #4299e1; }
 .url-input::placeholder { color: #a0aec0; }
@@ -127,19 +128,21 @@ body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-ser
 .nc:hover { transform: translateX(2px); }
 .nc.sel { border-color: #4299e1 !important; box-shadow: 0 0 0 3px rgba(66,153,225,.18); }
 .nc.hi { background: #fffbeb !important; border-color: #f6ad55 !important; }
-.lv-LD { background: #ebf8ff; border-color: #bee3f8; }
-.lv-LD:hover { background: #bee3f8; }
-.lv-MD { background: #f0fff4; border-color: #c6f6d5; }
-.lv-MD:hover { background: #c6f6d5; }
-.lv-Member { background: #fffff0; border-color: #fefcbf; }
-.lv-Member:hover { background: #fefcbf; }
+
+/* 순장/순원 색상 */
+.lv-순장 { background: #ebf8ff; border-color: #bee3f8; }
+.lv-순장:hover { background: #bee3f8; }
+.lv-순원 { background: #fffff0; border-color: #fefcbf; }
+.lv-순원:hover { background: #fefcbf; }
 .lv-x { background: #f7fafc; border-color: #e2e8f0; }
 .lv-x:hover { background: #edf2f7; }
+
 .badge { font-size: .63rem; font-weight: 700; padding: 2px 6px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
-.b-LD { background: #2b6cb0; color: white; }
-.b-MD { background: #276749; color: white; }
-.b-Member { background: #975a16; color: white; }
+.b-순장 { background: #2b6cb0; color: white; }
+.b-순원 { background: #975a16; color: white; }
 .b-x { background: #718096; color: white; }
+.휴학 { font-size: .62rem; background: #fed7d7; color: #c53030; border-radius: 8px; padding: 1px 5px; }
+
 .nn { font-size: .87rem; font-weight: 600; flex: 1; }
 .nm { font-size: .7rem; color: #718096; }
 .nt { font-size: .66rem; color: #a0aec0; flex-shrink: 0; transition: transform .2s; }
@@ -166,9 +169,9 @@ mark { background: #fefcbf; border-radius: 2px; padding: 0 2px; }
 }
 .empty { text-align: center; padding: 60px 20px; color: #a0aec0; }
 
-/* ── 뱃지 색 상속 ── */
-.lv-LD .child-chip { background: #ebf8ff; border-color: #bee3f8; }
-.lv-MD .child-chip { background: #f0fff4; border-color: #c6f6d5; }
+/* 자식 칩 색 상속 */
+.lv-순장 .child-chip { background: #ebf8ff; border-color: #bee3f8; }
+.lv-순원 .child-chip { background: #fffff0; border-color: #fefcbf; }
 </style>
 </head>
 <body>
@@ -176,31 +179,33 @@ mark { background: #fefcbf; border-radius: 2px; padding: 0 2px; }
 <!-- ══ 최초 설정 화면 ══ -->
 <div class="setup-overlay" id="setupOverlay">
   <div class="setup-card">
-    <h2>⛪ 순계보 뷰어 초기 설정</h2>
+    <h2>⛪ 성균관대 CCC 순계보</h2>
     <p>Google Sheets와 연결하면, 시트를 수정할 때마다 이 뷰어에 자동으로 반영돼요.</p>
-    
+
     <div class="step">
       <div class="step-num">1</div>
-      <div class="step-text">Google Sheets를 열고, <strong>파일 → 공유 → 링크 공유</strong>에서<br>
-        <code>링크가 있는 모든 사용자</code>로 설정 (보기 권한)</div>
+      <div class="step-text">Google Sheets → <strong>파일 → 공유 → 링크 공유</strong><br>
+        <code>링크가 있는 모든 사용자 (보기)</code>로 설정</div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
-      <div class="step-text">주소창에서 Sheets URL을 복사<br>
-        <code>https://docs.google.com/spreadsheets/d/<b>여기가 ID</b>/edit...</code></div>
+      <div class="step-text">주소창 URL 복사<br>
+        <code>https://docs.google.com/spreadsheets/d/<b>ID</b>/edit...</code></div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
-      <div class="step-text">각 시트 첫 번째 행(헤더): <code>이름</code> · <code>부모 순장</code> · <code>학과</code> · <code>학년</code> · <code>학번</code> · <code>연락처</code> · <code>레벨</code> · <code>가족순</code> · <code>CCC가입시기</code><br>
-        <span style="color:#68d391">✓ 성별은 시트 이름(형제/자매)에서 자동 감지돼요</span></div>
+      <div class="step-text">
+        시트 헤더 컬럼: <code>이름</code> · <code>부모 순장</code> · <code>학번</code> · <code>학과</code> · <code>학년</code> · <code>순원 여부</code> · <code>전화번호</code> · <code>활동 정도</code><br>
+        <span class="ok">✓ 성별은 시트 이름(형제/자매)에서 자동 감지돼요</span>
+      </div>
     </div>
 
     <input class="url-input" type="text" id="sheetUrlInput" placeholder="Google Sheets URL 붙여넣기...">
     <div style="display:flex;gap:8px;margin-top:10px">
-      <input class="url-input" type="text" id="sheet1Input" placeholder="형제 리스트 (시트 탭 이름)" style="margin-top:0;flex:1" value="형제 리스트">
-      <input class="url-input" type="text" id="sheet2Input" placeholder="자매 리스트 (시트 탭 이름)" style="margin-top:0;flex:1" value="자매 리스트">
+      <input class="url-input" type="text" id="sheet1Input" placeholder="형제 시트 탭 이름" style="margin-top:0;flex:1" value="형제 리스트">
+      <input class="url-input" type="text" id="sheet2Input" placeholder="자매 시트 탭 이름" style="margin-top:0;flex:1" value="자매 리스트">
     </div>
-    <p style="font-size:.76rem;color:#a0aec0;margin-top:6px;margin-bottom:0">시트 탭 이름이 다르면 수정하세요. 하나만 쓴다면 한 칸은 비워두세요.</p>
+    <p style="font-size:.76rem;color:#a0aec0;margin-top:6px;margin-bottom:0">탭 이름이 다르면 수정하세요. 한 쪽만 쓴다면 나머지 칸은 비워두세요.</p>
     <button class="setup-btn" onclick="saveConfig()">연결하기</button>
     <div class="setup-note">설정은 이 브라우저에 저장돼서 다음엔 바로 열려요</div>
   </div>
@@ -215,9 +220,10 @@ mark { background: #fefcbf; border-radius: 2px; padding: 0 2px; }
   <div class="header-right">
     <div class="stats-bar">
       <div class="stat-chip"><span id="totalCnt">-</span>전체</div>
-      <div class="stat-chip"><span id="ldCnt">-</span>LD</div>
-      <div class="stat-chip"><span id="mdCnt">-</span>MD</div>
-      <div class="stat-chip"><span id="memCnt">-</span>Member</div>
+      <div class="stat-chip"><span id="jangCnt">-</span>순장</div>
+      <div class="stat-chip"><span id="wonCnt">-</span>순원</div>
+      <div class="stat-chip"><span id="mCnt">-</span>형제</div>
+      <div class="stat-chip"><span id="fCnt">-</span>자매</div>
     </div>
     <button class="refresh-btn" onclick="loadData(true)">↻ 새로고침</button>
     <button class="config-btn" onclick="showSetup()" title="시트 설정">⚙</button>
@@ -227,15 +233,14 @@ mark { background: #fefcbf; border-radius: 2px; padding: 0 2px; }
 <div class="controls">
   <input class="search-box" type="text" id="searchInput" placeholder="이름, 학과, 학번으로 검색...">
   <select class="filter-sel" id="lvFilter">
-    <option value="">전체 레벨</option>
-    <option value="LD">LD</option>
-    <option value="MD">MD</option>
-    <option value="Member">Member</option>
+    <option value="">전체</option>
+    <option value="순장">순장만</option>
+    <option value="순원">순원만</option>
   </select>
   <select class="filter-sel" id="gFilter">
     <option value="">전체 성별</option>
-    <option value="M">남성 ♂</option>
-    <option value="F">여성 ♀</option>
+    <option value="M">형제 ♂</option>
+    <option value="F">자매 ♀</option>
   </select>
   <button class="btn btn-outline" onclick="expandAll()">전체 펼치기</button>
   <button class="btn btn-outline" onclick="collapseAll()">전체 접기</button>
@@ -257,11 +262,9 @@ mark { background: #fefcbf; border-radius: 2px; padding: 0 2px; }
 
 <script>
 // ══ 설정 ═══════════════════════════════════════════════════════════════════
-const STORAGE_KEY = 'ccc_sheet_config';
+const STORAGE_KEY = 'ccc_sheet_config_v2';
 let SHEET_ID = '';
-let SHEET_NAME = '인원 마스터';  // 시트 탭 이름
 
-// 로컬스토리지 대신 변수로 관리 (보안 제한 환경 대비)
 let _config = {};
 function saveLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { _config[k] = v; } }
 function loadLocal(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : _config[k]; } catch(e) { return _config[k]; } }
@@ -290,8 +293,8 @@ function showSetup() {
   if (cfg?.sheetId) {
     document.getElementById('sheetUrlInput').value = `https://docs.google.com/spreadsheets/d/${cfg.sheetId}/edit`;
     const sheets = cfg.sheets || ['형제 리스트','자매 리스트'];
-    document.getElementById('sheet1Input').value = sheets[0]||'';
-    document.getElementById('sheet2Input').value = sheets[1]||'';
+    document.getElementById('sheet1Input').value = sheets[0] || '';
+    document.getElementById('sheet2Input').value = sheets[1] || '';
   }
   document.getElementById('setupOverlay').style.display = 'flex';
 }
@@ -317,20 +320,19 @@ async function loadData(forceRefresh = false) {
   const cfg = loadLocal(STORAGE_KEY);
   if (!cfg?.sheetId) { showSetup(); return; }
   SHEET_ID = cfg.sheetId;
-  const sheets = cfg.sheets || [cfg.sheetName || '인원 마스터'];
+  const sheets = cfg.sheets || ['형제 리스트', '자매 리스트'];
 
   document.getElementById('treePanel').innerHTML = '<div class="loading"><div class="spinner"></div><span>Google Sheets에서 불러오는 중...</span></div>';
   document.getElementById('headerSubtitle').textContent = '데이터 로딩 중...';
 
   try {
-    // 두 시트 동시 요청
     const results = await Promise.allSettled(sheets.map(s => fetchSheet(SHEET_ID, s)));
-    
+
     allMembers = [];
     const errors = [];
     results.forEach((r, i) => {
       if (r.status === 'fulfilled') {
-        parseSheetData(r.value, sheets[i]);  // allMembers에 누적
+        parseSheetData(r.value, sheets[i]);
       } else {
         errors.push(`${sheets[i]}: ${r.reason.message}`);
       }
@@ -345,9 +347,11 @@ async function loadData(forceRefresh = false) {
     updateStats();
 
     const now = new Date();
-    document.getElementById('lastUpdated').textContent = `최근 업데이트: ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+    document.getElementById('lastUpdated').textContent =
+      `최근 업데이트: ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
     const loadedSheets = sheets.filter((_,i) => results[i].status === 'fulfilled');
-    document.getElementById('headerSubtitle').textContent = `${allMembers.length}명 · ${loadedSheets.join(' + ')}`;
+    document.getElementById('headerSubtitle').textContent =
+      `${allMembers.length}명 · ${loadedSheets.join(' + ')}`;
 
   } catch(err) {
     console.error(err);
@@ -373,48 +377,47 @@ function parseSheetData(table, sheetName) {
                    : sheetName?.includes('자매') ? 'F'
                    : '';
 
-  // 헤더 인덱스 찾기
   const cols = table.cols.map(c => c.label.trim());
   const idx = name => cols.indexOf(name);
 
-  // 컬럼 매핑 (유연하게 - 없으면 -1)
   const C = {
-    name:    idx('이름'),
-    parent:  idx('부모 순장'),
-    dept:    idx('학과'),
-    grade:   idx('학년'),
-    gender:  idx('성별'),
-    year:    idx('학번'),
-    phone:   idx('연락처'),
-    level:   idx('레벨'),
-    family:  idx('가족순'),
-    joined:  idx('CCC가입시기'),
-    salvation: idx('영접 시기'),
-    head:    idx('머리순장'),
-    active:  idx('재적'),
+    name:      idx('이름'),
+    parent:    idx('부모 순장'),
+    dept:      idx('학과'),
+    grade:     idx('학년'),
+    gender:    idx('성별'),        // 없으면 -1 → autoGender 사용
+    year:      idx('학번'),
+    phone:     idx('전화번호'),
+    level:     idx('순원 여부'),   // 순장 / 순원
+    activity:  idx('활동 정도'),
+    sabbatical:idx('휴학 여부'),
   };
-  
+
   function cell(row, colIdx) {
-    if (colIdx < 0 || !row.c[colIdx]) return '';
+    if (colIdx < 0 || !row.c?.[colIdx]) return '';
     const v = row.c[colIdx].v;
     const f = row.c[colIdx].f;
     return f ?? (v !== null && v !== undefined ? String(v) : '');
   }
-  
-  // allMembers는 loadData에서 관리 (여러 시트 누적)
+
+  // 학번을 깔끔하게 표시 (24.0 → "24", 24.5 → "24.5")
+  function fmtYear(raw) {
+    if (!raw) return '';
+    const n = parseFloat(raw);
+    if (isNaN(n)) return raw;
+    return Number.isInteger(n) ? String(Math.round(n)) : raw;
+  }
+
   table.rows.forEach(row => {
     const name = cell(row, C.name).trim();
     if (!name) return;
-    
-    // 재적 X면 건너뜀
-    const active = cell(row, C.active);
-    if (active === 'X' || active === 'x') return;
-    
-    // 이름 정규화: 뒤 숫자 제거
+
     const cleanN = name.replace(/\d+$/, '').trim();
     const parentRaw = cell(row, C.parent).trim();
     const parentClean = parentRaw.replace(/\d+$/, '').trim();
-    
+    const yearRaw = fmtYear(cell(row, C.year));
+    const isSabbatical = cell(row, C.sabbatical) === true || cell(row, C.sabbatical).toLowerCase() === 'true';
+
     allMembers.push({
       id: cleanN || name,
       rawName: name,
@@ -422,14 +425,12 @@ function parseSheetData(table, sheetName) {
       dept: cell(row, C.dept),
       grade: cell(row, C.grade),
       gender: cell(row, C.gender) || autoGender,
-      studentYear: cell(row, C.year),
+      studentYear: yearRaw,
       phone: cell(row, C.phone),
-      level: cell(row, C.level) || 'Member',
+      level: cell(row, C.level) || '순원',
+      activity: cell(row, C.activity),
+      sabbatical: isSabbatical,
       parent: parentClean || null,
-      familyGroup: cell(row, C.family),
-      joined: cell(row, C.joined),
-      salvation: cell(row, C.salvation),
-      headLeader: cell(row, C.head),
     });
   });
 }
@@ -438,14 +439,14 @@ function buildTree() {
   memberMap = {};
   childrenMap = {};
   externalRoots = [];
-  
-  // 중복 이름 처리
+
+  // 중복 이름 처리: 같은 이름이 2명 이상이면 rawName(학번 포함)을 id로
   const nameCount = {};
   allMembers.forEach(m => { nameCount[m.id] = (nameCount[m.id]||0)+1; });
   allMembers.forEach(m => { if (nameCount[m.id] > 1) { m.id = m.rawName; m.name = m.rawName; } });
-  
+
   allMembers.forEach(m => { memberMap[m.id] = m; });
-  
+
   const allParents = new Set();
   allMembers.forEach(m => {
     if (!m.parent) return;
@@ -453,7 +454,7 @@ function buildTree() {
     if (!childrenMap[m.parent]) childrenMap[m.parent] = [];
     childrenMap[m.parent].push(m.id);
   });
-  
+
   const memberKeys = new Set(Object.keys(memberMap));
   externalRoots = [...allParents].filter(p => !memberKeys.has(p)).sort();
 }
@@ -464,15 +465,18 @@ let searchQ = '';
 let lvF = '';
 let gF = '';
 
-function lvcls(lv) { return lv==='LD'?'lv-LD':lv==='MD'?'lv-MD':lv==='Member'?'lv-Member':'lv-x'; }
-function bcls(lv)  { return lv==='LD'?'b-LD':lv==='MD'?'b-MD':lv==='Member'?'b-Member':'b-x'; }
+function lvcls(lv) { return lv==='순장'?'lv-순장':lv==='순원'?'lv-순원':'lv-x'; }
+function bcls(lv)  { return lv==='순장'?'b-순장':lv==='순원'?'b-순원':'b-x'; }
 
 function matches(m) {
   if (lvF && m.level !== lvF) return false;
   if (gF && m.gender !== gF) return false;
   if (searchQ) {
     const q = searchQ.toLowerCase();
-    return m.name.toLowerCase().includes(q) || m.dept.toLowerCase().includes(q) || m.studentYear.includes(q) || m.phone.includes(q);
+    return m.name.toLowerCase().includes(q)
+      || m.dept.toLowerCase().includes(q)
+      || m.studentYear.includes(q)
+      || m.phone.includes(q);
   }
   return true;
 }
@@ -493,13 +497,15 @@ function renderNode(id, depth) {
   if (!m || !subtreeMatch(id)) return '';
   const kids = childrenMap[id]||[];
   const sortedKids = [...kids].sort((a,b) => {
-    const lo = {LD:0,MD:1,Member:2};
+    // 순장 먼저, 그다음 순원
+    const lo = {'순장':0,'순원':1};
     const ma = memberMap[a], mb = memberMap[b];
-    return (lo[ma?.level]??3)-(lo[mb?.level]??3) || a.localeCompare(b,'ko');
+    return (lo[ma?.level]??2)-(lo[mb?.level]??2) || a.localeCompare(b,'ko');
   });
   const gIcon = m.gender==='M'?'<span class="gM">♂</span>':m.gender==='F'?'<span class="gF">♀</span>':'';
-  const yr = m.studentYear ? m.studentYear.toString().slice(-2)+'학번' : '';
+  const yr = m.studentYear ? m.studentYear+'학번' : '';
   const meta = [yr, m.dept].filter(Boolean).join(' · ');
+  const sabbTag = m.sabbatical ? '<span class="휴학">휴학</span>' : '';
   const hasKids = sortedKids.length > 0;
   const isSel = selectedId === id;
   const isHi = searchQ && matches(m);
@@ -510,6 +516,7 @@ function renderNode(id, depth) {
       ${gIcon}
       <div class="nn">${hl(m.name)}</div>
       ${meta?`<div class="nm">${meta}</div>`:''}
+      ${sabbTag}
       <span class="badge ${bcls(m.level)}">${m.level||'-'}</span>
       ${hasKids?`<span class="nt ${initOpen?'op':''}" id="t-${CSS.escape(id)}">▶</span>`:''}
     </div>
@@ -520,14 +527,14 @@ function renderNode(id, depth) {
 function renderTree() {
   const panel = document.getElementById('treePanel');
   let html = '';
-  
+
   for (const root of externalRoots) {
     const kids = childrenMap[root]||[];
     const filteredKids = kids.filter(k => subtreeMatch(k));
     if (!filteredKids.length) continue;
     const sortedKids = [...filteredKids].sort((a,b)=>{
-      const lo={LD:0,MD:1,Member:2};
-      return (lo[memberMap[a]?.level]??3)-(lo[memberMap[b]?.level]??3);
+      const lo={'순장':0,'순원':1};
+      return (lo[memberMap[a]?.level]??2)-(lo[memberMap[b]?.level]??2);
     });
     const rootEsc = root.replace(/'/g,"\\'");
     html += `<div class="root-group">
@@ -541,8 +548,8 @@ function renderTree() {
       </div>
     </div>`;
   }
-  
-  // 부모 없는 멤버
+
+  // 부모 미지정 멤버
   const orphans = allMembers.filter(m => !m.parent && subtreeMatch(m.id));
   if (orphans.length) {
     html += `<div class="root-group">
@@ -556,16 +563,17 @@ function renderTree() {
       </div>
     </div>`;
   }
-  
+
   if (!html) html = '<div class="empty"><p style="font-size:2rem">🔍</p><p style="margin-top:12px;color:#a0aec0">검색 결과가 없어요.</p></div>';
   panel.innerHTML = html;
 }
 
 function updateStats() {
   document.getElementById('totalCnt').textContent = allMembers.length;
-  document.getElementById('ldCnt').textContent = allMembers.filter(m=>m.level==='LD').length;
-  document.getElementById('mdCnt').textContent = allMembers.filter(m=>m.level==='MD').length;
-  document.getElementById('memCnt').textContent = allMembers.filter(m=>m.level==='Member').length;
+  document.getElementById('jangCnt').textContent  = allMembers.filter(m=>m.level==='순장').length;
+  document.getElementById('wonCnt').textContent   = allMembers.filter(m=>m.level==='순원').length;
+  document.getElementById('mCnt').textContent     = allMembers.filter(m=>m.gender==='M').length;
+  document.getElementById('fCnt').textContent     = allMembers.filter(m=>m.gender==='F').length;
 }
 
 // ══ 상호작용 ════════════════════════════════════════════════════════════════
@@ -604,39 +612,39 @@ function showDetail(id) {
   const m = memberMap[id];
   if (!m) return;
   document.getElementById('detailPanel').classList.remove('hidden');
-  document.getElementById('dName').textContent = m.name;
+  document.getElementById('dName').textContent = m.name + (m.sabbatical ? ' (휴학)' : '');
   document.getElementById('dYear').textContent = m.studentYear ? m.studentYear+'학번' : '';
-  
+
   const kids = childrenMap[id]||[];
   const parentM = m.parent ? memberMap[m.parent] : null;
-  
+
   const rows = [
     ['학과', m.dept||'-'],
     ['학년', m.grade ? m.grade+'학년' : '-'],
-    ['성별', m.gender==='M'?'♂ 남성':m.gender==='F'?'♀ 여성':'-'],
-    ['연락처', m.phone||'-'],
-    ['레벨', `<span class="badge ${bcls(m.level)}">${m.level||'-'}</span>`],
-    ['가족순', m.familyGroup||'-'],
-    ['CCC 가입', m.joined||'-'],
-    ['영접 시기', m.salvation||'-'],
+    ['성별', m.gender==='M'?'♂ 형제':m.gender==='F'?'♀ 자매':'-'],
+    ['전화번호', m.phone||'-'],
+    ['구분', `<span class="badge ${bcls(m.level)}">${m.level||'-'}</span>`],
+    ['활동 정도', m.activity||'-'],
+    ['휴학', m.sabbatical ? '휴학 중' : '재학 중'],
     ['부모 순장', m.parent
       ? `<span style="color:${parentM?'#4299e1':'inherit'};cursor:${parentM?'pointer':'default'}" ${parentM?`onclick="jumpTo('${m.parent.replace(/'/g,"\\'")}')"`:''}>${m.parent}</span>`
       : '-'],
   ];
-  
+
   let html = rows.map(([l,v])=>`<div class="detail-row"><span class="dl">${l}</span><span class="dv">${v}</span></div>`).join('');
-  
+
   if (kids.length) {
-    html += `<div class="kids-section"><h4>이끈 멤버 (${kids.length}명)</h4>`;
+    html += `<div class="kids-section"><h4>내 순원 (${kids.length}명)</h4>`;
     html += kids.map(kid=>{
       const km = memberMap[kid]; if(!km) return '';
       return `<span class="child-chip ${lvcls(km.level)}" onclick="jumpTo('${kid.replace(/'/g,"\\'")}')">
-        ${km.name} <small style="opacity:.65">${km.studentYear?.toString().slice(-2)||''}학번</small>
+        ${km.gender==='M'?'<span class="gM" style="font-size:.68rem">♂</span>':'<span class="gF" style="font-size:.68rem">♀</span>'}
+        ${km.name} <small style="opacity:.65">${km.studentYear||''}학번</small>
       </span>`;
     }).join('');
     html += '</div>';
   }
-  
+
   document.getElementById('dBody').innerHTML = html;
 }
 
@@ -647,7 +655,6 @@ function jumpTo(id) {
   setTimeout(()=>{
     const el = document.getElementById('n-'+CSS.escape(id));
     if (!el) return;
-    // 접힌 부모 펼치기
     let p = el.parentElement;
     while(p) {
       if (p.classList.contains('tc') && p.classList.contains('col')) p.classList.remove('col');
@@ -680,11 +687,10 @@ document.getElementById('gFilter').addEventListener('change', e=>{ gF=e.target.v
 // ══ 시작 ════════════════════════════════════════════════════════════════════
 (function init() {
   const cfg = loadLocal(STORAGE_KEY);
-  if (cfg?.sheetId && (cfg.sheets?.length || cfg.sheetName)) {
+  if (cfg?.sheetId && cfg.sheets?.length) {
     document.getElementById('setupOverlay').style.display = 'none';
     loadData();
   }
-  // 없으면 설정 화면 유지
 })();
 </script>
 </body>
