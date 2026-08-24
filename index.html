@@ -3,158 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>성균관대 CCC 순계보</title>
+<title>성균관대 CCC 순계보 — 트리뷰</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif; background: #f0f4f8; color: #2d3748; }
-
-/* ── 설정 화면 ── */
-.setup-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.55);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 999;
-}
-.setup-card {
-  background: white; border-radius: 16px; padding: 36px 40px;
-  max-width: 540px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.25);
-}
-.setup-card h2 { font-size: 1.3rem; color: #1a365d; margin-bottom: 8px; }
-.setup-card p { font-size: .88rem; color: #718096; line-height: 1.6; margin-bottom: 18px; }
-.step { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
-.step-num { width: 24px; height: 24px; border-radius: 50%; background: #2b6cb0; color: white; font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-.step-text { font-size: .85rem; color: #4a5568; line-height: 1.7; }
-.step-text code { background: #edf2f7; padding: 1px 5px; border-radius: 4px; font-size: .82rem; color: #2d3748; }
-.step-text .ok { color: #38a169; font-size: .8rem; }
-.url-input { width: 100%; padding: 10px 14px; border: 1.5px solid #cbd5e0; border-radius: 8px; font-size: .88rem; outline: none; margin-top: 18px; }
-.url-input:focus { border-color: #4299e1; }
-.url-input::placeholder { color: #a0aec0; }
-.setup-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #2b6cb0, #4299e1); color: white; border: none; border-radius: 10px; font-size: .95rem; font-weight: 700; cursor: pointer; margin-top: 12px; }
-.setup-btn:hover { opacity: .92; }
-.setup-note { font-size: .78rem; color: #a0aec0; text-align: center; margin-top: 10px; }
-
-/* ── 헤더 ── */
-.app-header {
-  background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%);
-  color: white; padding: 16px 28px;
-  display: flex; align-items: center; justify-content: space-between;
+body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+       background: #f0f4f8; color: #2d3748; }
+.hdr {
+  background: linear-gradient(135deg, #1a365d, #2b6cb0);
+  color: white; padding: 14px 24px;
+  display: flex; align-items: center; gap: 14px;
   box-shadow: 0 4px 12px rgba(0,0,0,.3);
   position: sticky; top: 0; z-index: 100;
 }
-.app-header h1 { font-size: 1.3rem; font-weight: 700; }
-.app-header .subtitle { font-size: .8rem; opacity: .75; margin-top: 2px; }
-.header-right { display: flex; align-items: center; gap: 12px; }
-.stats-bar { display: flex; gap: 10px; }
-.stat-chip { background: rgba(255,255,255,.2); border-radius: 14px; padding: 5px 12px; font-size: .75rem; text-align: center; }
-.stat-chip span { display: block; font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
-.refresh-btn {
+.hdr h1 { font-size: 1.15rem; font-weight: 700; flex: 1; }
+.hdr-sub { font-size: .78rem; opacity: .72; }
+.btn-hdr {
   background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.4);
-  color: white; border-radius: 8px; padding: 6px 12px;
-  font-size: .78rem; cursor: pointer; font-weight: 600;
+  color: white; border-radius: 8px; padding: 6px 13px;
+  font-size: .78rem; cursor: pointer; font-weight: 600; white-space: nowrap;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
 }
-.refresh-btn:hover { background: rgba(255,255,255,.28); }
-.config-btn {
-  background: transparent; border: 1.5px solid rgba(255,255,255,.4);
-  color: rgba(255,255,255,.8); border-radius: 8px; padding: 6px 10px;
-  font-size: .75rem; cursor: pointer;
+.btn-hdr:hover { background: rgba(255,255,255,.28); }
+.legend {
+  display: flex; gap: 14px; flex-wrap: wrap; padding: 10px 24px;
+  background: white; border-bottom: 1px solid #e2e8f0; font-size: .76rem;
+  align-items: center;
 }
-
-/* ── 컨트롤 바 ── */
-.controls {
-  background: white; padding: 11px 28px;
-  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-  border-bottom: 1px solid #e2e8f0;
-}
-.search-box {
-  flex: 1; min-width: 200px; padding: 8px 14px 8px 38px;
-  border: 1.5px solid #cbd5e0; border-radius: 8px; font-size: .88rem;
-  outline: none; transition: border-color .2s;
-  background: #f7fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 11px center;
-}
-.search-box:focus { border-color: #4299e1; background-color: white; }
-.filter-sel { padding: 7px 10px; border: 1.5px solid #cbd5e0; border-radius: 8px; font-size: .83rem; background: white; cursor: pointer; outline: none; }
-.btn { padding: 7px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: .81rem; font-weight: 600; }
-.btn-outline { background: white; color: #4a5568; border: 1.5px solid #cbd5e0; }
-.btn-outline:hover { background: #edf2f7; }
-.last-updated { font-size: .75rem; color: #a0aec0; margin-left: auto; white-space: nowrap; }
-
-/* ── 메인 ── */
-.main { display: flex; height: calc(100vh - 112px); }
-.tree-panel { flex: 1; overflow-y: auto; padding: 18px 24px; }
-.tree-panel::-webkit-scrollbar { width: 5px; }
-.tree-panel::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
-
-/* ── 상세 패널 ── */
-.detail-panel { width: 285px; background: white; border-left: 1px solid #e2e8f0; overflow-y: auto; }
-.detail-panel.hidden { width: 0; overflow: hidden; }
-.detail-header { background: linear-gradient(135deg, #1a365d, #2b6cb0); color: white; padding: 14px 16px; }
-.detail-header h3 { font-size: 1.05rem; font-weight: 700; }
-.dy { font-size: .76rem; opacity: .72; margin-top: 2px; }
-.detail-body { padding: 12px 16px; }
-.detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f4f8; font-size: .83rem; }
-.detail-row:last-child { border-bottom: none; }
-.dl { color: #718096; }
-.dv { color: #2d3748; font-weight: 600; text-align: right; max-width: 160px; word-break: keep-all; }
-.kids-section { margin-top: 12px; }
-.kids-section h4 { font-size: .78rem; color: #718096; margin-bottom: 7px; font-weight: 600; }
-.child-chip { display: inline-block; margin: 2px; padding: 4px 9px; border-radius: 14px; font-size: .73rem; cursor: pointer; transition: transform .1s; border: 1px solid transparent; }
-.child-chip:hover { transform: scale(1.07); }
-
-/* ── 트리 ── */
-.root-group { margin-bottom: 16px; }
-.root-label {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 14px;
+.leg { display: flex; align-items: center; gap: 5px; }
+.leg-box { width: 14px; height: 14px; border-radius: 3px; border: 2px solid; flex-shrink: 0; }
+.main { padding: 20px 24px; }
+.root-section { margin-bottom: 32px; }
+.root-title {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 18px; border-radius: 20px;
   background: linear-gradient(90deg, #1a365d, #2b6cb0);
-  color: white; border-radius: 10px; font-weight: 700; font-size: .9rem;
-  margin-bottom: 4px; cursor: pointer; user-select: none;
+  color: white; font-weight: 700; font-size: .9rem;
+  margin-bottom: 16px;
 }
-.root-label:hover { opacity: .9; }
-.root-label .ri { margin-left: auto; font-size: .7rem; transition: transform .2s; }
-.root-label.col .ri { transform: rotate(-90deg); }
-.tc { overflow: hidden; }
-.tc.col { display: none; }
-.tree-node { position: relative; padding-left: 22px; }
-.tree-node::before { content: ''; position: absolute; left: 9px; top: 0; bottom: 0; width: 1.5px; background: #e2e8f0; }
-.tree-node:last-child::before { height: 16px; }
-.nc {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 10px; margin: 2px 0;
-  border-radius: 8px; cursor: pointer;
-  transition: all .15s; position: relative;
-  border: 1.5px solid transparent;
+.svg-wrap {
+  overflow-x: auto; overflow-y: visible;
+  background: white; border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
-.nc::before { content: ''; position: absolute; left: -13px; top: 50%; width: 13px; height: 1.5px; background: #e2e8f0; }
-.nc:hover { transform: translateX(2px); }
-.nc.sel { border-color: #4299e1 !important; box-shadow: 0 0 0 3px rgba(66,153,225,.18); }
-.nc.hi { background: #fffbeb !important; border-color: #f6ad55 !important; }
-
-/* 순장/순원 색상 */
-.lv-순장 { background: #ebf8ff; border-color: #bee3f8; }
-.lv-순장:hover { background: #bee3f8; }
-.lv-순원 { background: #fffff0; border-color: #fefcbf; }
-.lv-순원:hover { background: #fefcbf; }
-.lv-x { background: #f7fafc; border-color: #e2e8f0; }
-.lv-x:hover { background: #edf2f7; }
-
-.badge { font-size: .63rem; font-weight: 700; padding: 2px 6px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
-.b-순장 { background: #2b6cb0; color: white; }
-.b-순원 { background: #975a16; color: white; }
-.b-x { background: #718096; color: white; }
-.휴학 { font-size: .62rem; background: #fed7d7; color: #c53030; border-radius: 8px; padding: 1px 5px; }
-
-.nn { font-size: .87rem; font-weight: 600; flex: 1; }
-.nm { font-size: .7rem; color: #718096; }
-.nt { font-size: .66rem; color: #a0aec0; flex-shrink: 0; transition: transform .2s; }
-.nt.op { transform: rotate(90deg); }
-.gM { color: #4299e1; }
-.gF { color: #ed64a6; }
-mark { background: #fefcbf; border-radius: 2px; padding: 0 2px; }
-
-/* ── 로딩 ── */
+.section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.btn-save {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 14px; border-radius: 16px;
+  background: white; border: 1.5px solid #cbd5e0;
+  color: #4a5568; font-size: .76rem; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.btn-save:hover { background: #edf2f7; border-color: #a0aec0; }
+.btn-save.saving { opacity: .6; pointer-events: none; }
+.tooltip {
+  position: fixed; z-index: 200;
+  background: white; border: 1px solid #e2e8f0;
+  border-radius: 10px; padding: 10px 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  font-size: .82rem; max-width: 220px;
+  pointer-events: none; opacity: 0; transition: opacity .1s;
+}
+.tooltip.show { opacity: 1; }
+.tt-name { font-size: .95rem; font-weight: 700; margin-bottom: 5px; }
+.tt-row { color: #718096; margin: 2px 0; }
+.tt-row span { color: #2d3748; font-weight: 600; }
 .loading {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 60%; gap: 16px; color: #718096;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; height: 60vh; gap: 16px; color: #718096;
 }
 .spinner {
   width: 40px; height: 40px; border: 3px solid #e2e8f0;
@@ -167,286 +84,174 @@ mark { background: #fefcbf; border-radius: 2px; padding: 0 2px; }
   padding: 20px 24px; max-width: 480px; margin: 40px auto;
   text-align: center; color: #c53030;
 }
-.empty { text-align: center; padding: 60px 20px; color: #a0aec0; }
-
-/* 자식 칩 색 상속 */
-.lv-순장 .child-chip { background: #ebf8ff; border-color: #bee3f8; }
-.lv-순원 .child-chip { background: #fffff0; border-color: #fefcbf; }
+.setup-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55);
+  display: flex; align-items: center; justify-content: center; z-index: 999;
+}
+.setup-card {
+  background: white; border-radius: 16px; padding: 36px 40px;
+  max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+.setup-card h2 { font-size: 1.2rem; color: #1a365d; margin-bottom: 10px; }
+.setup-card p { font-size: .86rem; color: #718096; line-height: 1.6; margin-bottom: 16px; }
+.url-input { width: 100%; padding: 10px 14px; border: 1.5px solid #cbd5e0;
+             border-radius: 8px; font-size: .88rem; outline: none; margin-top: 10px; }
+.url-input:focus { border-color: #4299e1; }
+.setup-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #2b6cb0, #4299e1);
+             color: white; border: none; border-radius: 10px; font-size: .95rem;
+             font-weight: 700; cursor: pointer; margin-top: 12px; }
 </style>
 </head>
 <body>
 
-<!-- ══ 최초 설정 화면 ══ -->
-<div class="setup-overlay" id="setupOverlay">
+<div class="setup-overlay" id="setupOverlay" style="display:none">
   <div class="setup-card">
-    <h2>⛪ 성균관대 CCC 순계보</h2>
-    <p>Google Sheets와 연결하면, 시트를 수정할 때마다 이 뷰어에 자동으로 반영돼요.</p>
-
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-text">Google Sheets → <strong>파일 → 공유 → 링크 공유</strong><br>
-        <code>링크가 있는 모든 사용자 (보기)</code>로 설정</div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-text">주소창 URL 복사<br>
-        <code>https://docs.google.com/spreadsheets/d/<b>ID</b>/edit...</code></div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-text">
-        시트 헤더 컬럼: <code>이름</code> · <code>부모 순장</code> · <code>학번</code> · <code>학과</code> · <code>학년</code> · <code>순원 여부</code> · <code>전화번호</code> · <code>활동 정도</code><br>
-        <span class="ok">✓ 성별은 시트 이름(형제/자매)에서 자동 감지돼요</span>
-      </div>
-    </div>
-
-    <input class="url-input" type="text" id="sheetUrlInput" placeholder="Google Sheets URL 붙여넣기...">
+    <h2>⛪ 순계보 트리뷰어</h2>
+    <p>메인 뷰어에서 한 번 설정하면 여기서도 자동으로 연결돼요.<br>
+       아직 설정하지 않았다면 아래에 Google Sheets URL을 입력해주세요.</p>
+    <input class="url-input" type="text" id="sheetUrlInput" placeholder="Google Sheets URL...">
     <div style="display:flex;gap:8px;margin-top:10px">
-      <input class="url-input" type="text" id="sheet1Input" placeholder="형제 시트 탭 이름" style="margin-top:0;flex:1" value="형제 리스트">
-      <input class="url-input" type="text" id="sheet2Input" placeholder="자매 시트 탭 이름" style="margin-top:0;flex:1" value="자매 리스트">
+      <input class="url-input" type="text" id="sheet1Input" placeholder="형제 시트" style="margin-top:0;flex:1" value="형제 리스트">
+      <input class="url-input" type="text" id="sheet2Input" placeholder="자매 시트" style="margin-top:0;flex:1" value="자매 리스트">
     </div>
-    <p style="font-size:.76rem;color:#a0aec0;margin-top:6px;margin-bottom:0">탭 이름이 다르면 수정하세요. 한 쪽만 쓴다면 나머지 칸은 비워두세요.</p>
     <button class="setup-btn" onclick="saveConfig()">연결하기</button>
-    <div class="setup-note">설정은 이 브라우저에 저장돼서 다음엔 바로 열려요</div>
   </div>
 </div>
 
-<!-- ══ 앱 ══ -->
-<header class="app-header">
-  <div>
-    <h1>⛪ 성균관대 CCC 순계보</h1>
-    <div class="subtitle" id="headerSubtitle">데이터 로딩 중...</div>
+<header class="hdr">
+  <div style="flex:1">
+    <h1>🌳 성균관대 CCC 순계보 — 트리뷰</h1>
+    <div class="hdr-sub" id="hdrSub">로딩 중...</div>
   </div>
-  <div class="header-right">
-    <div class="stats-bar">
-      <div class="stat-chip"><span id="totalCnt">-</span>전체</div>
-      <div class="stat-chip"><span id="jangCnt">-</span>순장</div>
-      <div class="stat-chip"><span id="wonCnt">-</span>순원</div>
-      <div class="stat-chip"><span id="mCnt">-</span>형제</div>
-      <div class="stat-chip"><span id="fCnt">-</span>자매</div>
-    </div>
-    <button class="refresh-btn" onclick="loadData(true)">↻ 새로고침</button>
-    <button class="config-btn" onclick="showSetup()" title="시트 설정">⚙</button>
-  </div>
+  <button class="btn-hdr" onclick="loadData()" style="border:none">↻ 새로고침</button>
+  <a class="btn-hdr" href="index.html">← 메인 뷰어</a>
 </header>
 
-<div class="controls">
-  <input class="search-box" type="text" id="searchInput" placeholder="이름, 학과, 학번으로 검색...">
-  <select class="filter-sel" id="lvFilter">
-    <option value="">전체</option>
-    <option value="순장">순장만</option>
-    <option value="순원">순원만</option>
-  </select>
-  <select class="filter-sel" id="gFilter">
-    <option value="">전체 성별</option>
-    <option value="M">형제 ♂</option>
-    <option value="F">자매 ♀</option>
-  </select>
-  <button class="btn btn-outline" onclick="expandAll()">전체 펼치기</button>
-  <button class="btn btn-outline" onclick="collapseAll()">전체 접기</button>
-  <span class="last-updated" id="lastUpdated"></span>
+<div class="legend">
+  <strong style="font-size:.76rem;color:#4a5568">색상 기호:</strong>
+  <div class="leg"><div class="leg-box" style="background:#dbeafe;border-color:#60a5fa"></div> 형제 순장</div>
+  <div class="leg"><div class="leg-box" style="background:#fce7f3;border-color:#f9a8d4"></div> 자매 순장</div>
+  <div class="leg"><div class="leg-box" style="background:#f0f9ff;border-color:#bae6fd"></div> 형제 순원</div>
+  <div class="leg"><div class="leg-box" style="background:#fdf4ff;border-color:#e9d5ff"></div> 자매 순원</div>
+  <span style="color:#a0aec0;margin-left:auto;font-size:.74rem">노드에 마우스를 올리면 상세 정보가 표시돼요</span>
 </div>
 
-<div class="main">
-  <div class="tree-panel" id="treePanel">
-    <div class="loading"><div class="spinner"></div><span>Google Sheets에서 데이터를 불러오는 중...</span></div>
-  </div>
-  <div class="detail-panel hidden" id="detailPanel">
-    <div class="detail-header">
-      <h3 id="dName">-</h3>
-      <div class="dy" id="dYear"></div>
-    </div>
-    <div class="detail-body" id="dBody"></div>
-  </div>
+<div class="main" id="main">
+  <div class="loading"><div class="spinner"></div><span>데이터 로딩 중...</span></div>
 </div>
+
+<div class="tooltip" id="tooltip"></div>
 
 <script>
-// ══ 설정 ═══════════════════════════════════════════════════════════════════
 const STORAGE_KEY = 'ccc_sheet_config_v2';
-let SHEET_ID = '';
 
-let _config = {};
-function saveLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { _config[k] = v; } }
-function loadLocal(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : _config[k]; } catch(e) { return _config[k]; } }
-
+function loadLocal(k) {
+  try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e) { return null; }
+}
+function saveLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
 function extractSheetId(url) {
   const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
   return m ? m[1] : null;
 }
-
 function saveConfig() {
   const url = document.getElementById('sheetUrlInput').value.trim();
   const id = extractSheetId(url);
-  if (!id) { alert('올바른 Google Sheets URL이 아닌 것 같아요. URL을 다시 확인해주세요.'); return; }
+  if (!id) { alert('올바른 URL이 아닌 것 같아요.'); return; }
   const s1 = document.getElementById('sheet1Input').value.trim();
   const s2 = document.getElementById('sheet2Input').value.trim();
-  if (!s1 && !s2) { alert('시트 탭 이름을 하나 이상 입력해주세요.'); return; }
-  SHEET_ID = id;
-  const cfg = { sheetId: id, sheets: [s1, s2].filter(Boolean) };
-  saveLocal(STORAGE_KEY, cfg);
+  saveLocal(STORAGE_KEY, { sheetId: id, sheets: [s1,s2].filter(Boolean) });
   document.getElementById('setupOverlay').style.display = 'none';
   loadData();
 }
 
-function showSetup() {
-  const cfg = loadLocal(STORAGE_KEY);
-  if (cfg?.sheetId) {
-    document.getElementById('sheetUrlInput').value = `https://docs.google.com/spreadsheets/d/${cfg.sheetId}/edit`;
-    const sheets = cfg.sheets || ['형제 리스트','자매 리스트'];
-    document.getElementById('sheet1Input').value = sheets[0] || '';
-    document.getElementById('sheet2Input').value = sheets[1] || '';
-  }
-  document.getElementById('setupOverlay').style.display = 'flex';
-}
-
-// ══ 데이터 로딩 ════════════════════════════════════════════════════════════
-let memberMap = {};
-let childrenMap = {};
-let externalRoots = [];
-let allMembers = [];
+let memberMap = {}, childrenMap = {}, externalRoots = [], allMembers = [];
 
 async function fetchSheet(sheetId, sheetName) {
-  const sheetParam = encodeURIComponent(sheetName);
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetParam}&t=${Date.now()}`;
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
   const res = await fetch(url);
   const text = await res.text();
-  const jsonText = text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, '');
-  const json = JSON.parse(jsonText);
-  if (json.status === 'error') throw new Error(`[${sheetName}] ${json.errors?.[0]?.message || '불러오기 실패'}`);
+  const json = JSON.parse(text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
+  if (json.status === 'error') throw new Error(json.errors?.[0]?.message || '불러오기 실패');
   return json.table;
 }
 
-async function loadData(forceRefresh = false) {
+async function loadData() {
   const cfg = loadLocal(STORAGE_KEY);
-  if (!cfg?.sheetId) { showSetup(); return; }
-  SHEET_ID = cfg.sheetId;
+  if (!cfg || !cfg.sheetId) { document.getElementById('setupOverlay').style.display = 'flex'; return; }
   const sheets = cfg.sheets || ['형제 리스트', '자매 리스트'];
-
-  document.getElementById('treePanel').innerHTML = '<div class="loading"><div class="spinner"></div><span>Google Sheets에서 불러오는 중...</span></div>';
-  document.getElementById('headerSubtitle').textContent = '데이터 로딩 중...';
-
+  document.getElementById('main').innerHTML = '<div class="loading"><div class="spinner"></div><span>Google Sheets에서 불러오는 중...</span></div>';
   try {
-    const results = await Promise.allSettled(sheets.map(s => fetchSheet(SHEET_ID, s)));
-
+    const results = await Promise.allSettled(sheets.map(s => fetchSheet(cfg.sheetId, s)));
     allMembers = [];
-    const errors = [];
-    results.forEach((r, i) => {
-      if (r.status === 'fulfilled') {
-        parseSheetData(r.value, sheets[i]);
-      } else {
-        errors.push(`${sheets[i]}: ${r.reason.message}`);
-      }
-    });
-
-    if (allMembers.length === 0) {
-      throw new Error(errors.join('\n') || '데이터가 없어요');
-    }
-
-    buildTree();
-    renderTree();
-    updateStats();
-
-    const now = new Date();
-    document.getElementById('lastUpdated').textContent =
-      `최근 업데이트: ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
-    const loadedSheets = sheets.filter((_,i) => results[i].status === 'fulfilled');
-    document.getElementById('headerSubtitle').textContent =
-      `${allMembers.length}명 · ${loadedSheets.join(' + ')}`;
-
-  } catch(err) {
-    console.error(err);
-    document.getElementById('treePanel').innerHTML = `
+    results.forEach((r, i) => { if (r.status === 'fulfilled') parseSheet(r.value, sheets[i]); });
+    if (!allMembers.length) throw new Error('데이터가 없어요.');
+    build();
+    render();
+    document.getElementById('hdrSub').textContent = `총 ${allMembers.length}명 · ${sheets.filter((_,i)=>results[i].status==='fulfilled').join(' + ')}`;
+  } catch(e) {
+    document.getElementById('main').innerHTML = `
       <div class="error-box">
         <p style="font-size:1.5rem;margin-bottom:8px">⚠️</p>
-        <p><strong>데이터를 불러오지 못했어요</strong></p>
-        <p style="margin-top:8px;font-size:.85rem;color:#e53e3e;white-space:pre-line">${err.message}</p>
-        <p style="margin-top:12px;font-size:.82rem;color:#718096">
-          시트 탭 이름이 정확한지, 공유 설정이 <strong>"링크가 있는 모든 사용자 (보기)"</strong>인지 확인해주세요.
-        </p>
-        <button onclick="showSetup()" style="margin-top:14px;padding:8px 20px;background:#2b6cb0;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600">
-          설정 다시 하기
-        </button>
+        <p><strong>불러오기 실패</strong></p>
+        <p style="margin-top:8px;font-size:.85rem">${e.message}</p>
+        <button onclick="document.getElementById('setupOverlay').style.display='flex'"
+          style="margin-top:14px;padding:8px 20px;background:#2b6cb0;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600">설정 다시 하기</button>
       </div>`;
   }
 }
 
-// ══ 시트 파싱 ═══════════════════════════════════════════════════════════════
-function parseSheetData(table, sheetName) {
-  // 시트 이름으로 성별 자동 감지
-  const autoGender = sheetName?.includes('형제') ? 'M'
-                   : sheetName?.includes('자매') ? 'F'
-                   : '';
-
+function parseSheet(table, sheetName) {
+  const autoGender = sheetName.includes('형제') ? 'M' : sheetName.includes('자매') ? 'F' : '';
   const cols = table.cols.map(c => c.label.trim());
-  const idx = name => cols.indexOf(name);
-
+  const idx = n => cols.indexOf(n);
   const C = {
-    name:      idx('이름'),
-    parent:    idx('부모 순장'),
-    dept:      idx('학과'),
-    grade:     idx('학년'),
-    gender:    idx('성별'),        // 없으면 -1 → autoGender 사용
-    year:      idx('학번'),
-    phone:     idx('전화번호'),
-    level:     idx('순원 여부'),   // 순장 / 순원
-    activity:  idx('활동 정도'),
-    sabbatical:idx('휴학 여부'),
+    name: idx('이름'), parent: idx('부모 순장'), dept: idx('학과'),
+    grade: idx('학년'), year: idx('학번'), phone: idx('전화번호'),
+    level: idx('순원 여부'), activity: idx('활동 정도'), sabbatical: idx('휴학 여부'),
   };
-
-  function cell(row, colIdx) {
-    if (colIdx < 0 || !row.c?.[colIdx]) return '';
-    const v = row.c[colIdx].v;
-    const f = row.c[colIdx].f;
-    return f ?? (v !== null && v !== undefined ? String(v) : '');
-  }
-
-  // 학번을 깔끔하게 표시 (24.0 → "24", 24.5 → "24.5")
-  function fmtYear(raw) {
-    if (!raw) return '';
-    const n = parseFloat(raw);
-    if (isNaN(n)) return raw;
-    return Number.isInteger(n) ? String(Math.round(n)) : raw;
-  }
+  const cell = (row, ci) => {
+    if (ci < 0 || !row.c || !row.c[ci]) return '';
+    const v = row.c[ci].v, f = row.c[ci].f;
+    return f != null ? f : (v != null ? String(v) : '');
+  };
+  const numVal = (row, ci) => {
+    if (ci < 0 || !row.c || !row.c[ci]) return null;
+    return row.c[ci].v != null ? row.c[ci].v : null;
+  };
+  const fmtYear = v => {
+    if (v == null) return '';
+    const n = typeof v === 'number' ? v : parseFloat(v);
+    if (isNaN(n)) return String(v);
+    const i = Math.floor(n), f = Math.round((n - i) * 10);
+    return f === 0 ? String(i) : (i + '.' + f);
+  };
 
   table.rows.forEach(row => {
     const name = cell(row, C.name).trim();
     if (!name) return;
-
     const cleanN = name.replace(/\d+$/, '').trim();
-    const parentRaw = cell(row, C.parent).trim();
-    const parentClean = parentRaw.replace(/\d+$/, '').trim();
-    const yearRaw = fmtYear(cell(row, C.year));
-    const isSabbatical = cell(row, C.sabbatical) === true || cell(row, C.sabbatical).toLowerCase() === 'true';
-
+    const parentRaw = cell(row, C.parent).trim().replace(/\d+$/, '').trim();
+    const sabbVal = (row.c && row.c[C.sabbatical]) ? row.c[C.sabbatical].v : null;
     allMembers.push({
-      id: cleanN || name,
-      rawName: name,
-      name: cleanN || name,
-      dept: cell(row, C.dept),
-      grade: cell(row, C.grade),
-      gender: cell(row, C.gender) || autoGender,
-      studentYear: yearRaw,
+      id: cleanN || name, rawName: name, name: cleanN || name,
+      dept: cell(row, C.dept), grade: cell(row, C.grade),
+      gender: autoGender,
+      studentYear: fmtYear(numVal(row, C.year)),
       phone: cell(row, C.phone),
       level: cell(row, C.level) || '순원',
       activity: cell(row, C.activity),
-      sabbatical: isSabbatical,
-      parent: parentClean || null,
+      sabbatical: sabbVal === true || String(sabbVal).toLowerCase() === 'true',
+      parent: parentRaw || null,
     });
   });
 }
 
-function buildTree() {
-  memberMap = {};
-  childrenMap = {};
-  externalRoots = [];
-
-  // 중복 이름 처리: 같은 이름이 2명 이상이면 rawName(학번 포함)을 id로
-  const nameCount = {};
-  allMembers.forEach(m => { nameCount[m.id] = (nameCount[m.id]||0)+1; });
-  allMembers.forEach(m => { if (nameCount[m.id] > 1) { m.id = m.rawName; m.name = m.rawName; } });
-
+function build() {
+  memberMap = {}; childrenMap = {}; externalRoots = [];
+  const cnt = {};
+  allMembers.forEach(m => { cnt[m.id] = (cnt[m.id] || 0) + 1; });
+  allMembers.forEach(m => { if (cnt[m.id] > 1) { m.id = m.rawName; m.name = m.rawName; } });
   allMembers.forEach(m => { memberMap[m.id] = m; });
-
   const allParents = new Set();
   allMembers.forEach(m => {
     if (!m.parent) return;
@@ -454,244 +259,220 @@ function buildTree() {
     if (!childrenMap[m.parent]) childrenMap[m.parent] = [];
     childrenMap[m.parent].push(m.id);
   });
-
-  const memberKeys = new Set(Object.keys(memberMap));
-  externalRoots = [...allParents].filter(p => !memberKeys.has(p)).sort();
+  const mKeys = new Set(Object.keys(memberMap));
+  externalRoots = [...allParents].filter(p => !mKeys.has(p)).sort();
 }
 
-// ══ 렌더링 ══════════════════════════════════════════════════════════════════
-let selectedId = null;
-let searchQ = '';
-let lvF = '';
-let gF = '';
+// ── 트리 레이아웃 ──
+const NW = 78, NH = 30, XGAP = 10, YGAP = 56;
 
-function lvcls(lv) { return lv==='순장'?'lv-순장':lv==='순원'?'lv-순원':'lv-x'; }
-function bcls(lv)  { return lv==='순장'?'b-순장':lv==='순원'?'b-순원':'b-x'; }
-
-function matches(m) {
-  if (lvF && m.level !== lvF) return false;
-  if (gF && m.gender !== gF) return false;
-  if (searchQ) {
-    const q = searchQ.toLowerCase();
-    return m.name.toLowerCase().includes(q)
-      || m.dept.toLowerCase().includes(q)
-      || m.studentYear.includes(q)
-      || m.phone.includes(q);
-  }
-  return true;
-}
-function subtreeMatch(id) {
-  const m = memberMap[id];
-  if (!m) return false;
-  if (matches(m)) return true;
-  return (childrenMap[id]||[]).some(kid => subtreeMatch(kid));
-}
-function hl(txt) {
-  if (!searchQ || !txt) return txt||'';
-  const re = new RegExp(`(${searchQ.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
-  return txt.replace(re, '<mark>$1</mark>');
-}
-
-function renderNode(id, depth) {
-  const m = memberMap[id];
-  if (!m || !subtreeMatch(id)) return '';
-  const kids = childrenMap[id]||[];
-  const sortedKids = [...kids].sort((a,b) => {
-    // 순장 먼저, 그다음 순원
-    const lo = {'순장':0,'순원':1};
-    const ma = memberMap[a], mb = memberMap[b];
-    return (lo[ma?.level]??2)-(lo[mb?.level]??2) || a.localeCompare(b,'ko');
-  });
-  const gIcon = m.gender==='M'?'<span class="gM">♂</span>':m.gender==='F'?'<span class="gF">♀</span>':'';
-  const yr = m.studentYear ? m.studentYear+'학번' : '';
-  const meta = [yr, m.dept].filter(Boolean).join(' · ');
-  const sabbTag = m.sabbatical ? '<span class="휴학">휴학</span>' : '';
-  const hasKids = sortedKids.length > 0;
-  const isSel = selectedId === id;
-  const isHi = searchQ && matches(m);
-  const initOpen = !!searchQ;
-
-  return `<div class="tree-node">
-    <div class="nc ${lvcls(m.level)} ${isSel?'sel':''} ${isHi?'hi':''}" id="n-${CSS.escape(id)}" onclick="onNode('${id.replace(/'/g,"\\'")}',event)">
-      ${gIcon}
-      <div class="nn">${hl(m.name)}</div>
-      ${meta?`<div class="nm">${meta}</div>`:''}
-      ${sabbTag}
-      <span class="badge ${bcls(m.level)}">${m.level||'-'}</span>
-      ${hasKids?`<span class="nt ${initOpen?'op':''}" id="t-${CSS.escape(id)}">▶</span>`:''}
-    </div>
-    ${hasKids?`<div class="tc${initOpen?'':' col'}" id="c-${CSS.escape(id)}">${sortedKids.map(k=>renderNode(k,depth+1)).join('')}</div>`:''}
-  </div>`;
-}
-
-function renderTree() {
-  const panel = document.getElementById('treePanel');
-  let html = '';
-
-  for (const root of externalRoots) {
-    const kids = childrenMap[root]||[];
-    const filteredKids = kids.filter(k => subtreeMatch(k));
-    if (!filteredKids.length) continue;
-    const sortedKids = [...filteredKids].sort((a,b)=>{
-      const lo={'순장':0,'순원':1};
-      return (lo[memberMap[a]?.level]??2)-(lo[memberMap[b]?.level]??2);
+function getKids(id) {
+  return (childrenMap[id] || [])
+    .filter(k => memberMap[k])
+    .sort((a, b) => {
+      const lo = { '순장': 0, '순원': 1 };
+      return (lo[memberMap[a] && memberMap[a].level] != null ? lo[memberMap[a].level] : 2)
+           - (lo[memberMap[b] && memberMap[b].level] != null ? lo[memberMap[b].level] : 2);
     });
-    const rootEsc = root.replace(/'/g,"\\'");
-    html += `<div class="root-group">
-      <div class="root-label" id="rl-${CSS.escape(root)}" onclick="toggleRoot('${rootEsc}')">
-        <span>⛪</span><span>${root}</span>
-        <span style="font-size:.72rem;opacity:.72">(${filteredKids.length}명)</span>
-        <span class="ri">▼</span>
-      </div>
-      <div class="tc" id="rc-${CSS.escape(root)}">
-        ${sortedKids.map(k=>renderNode(k,0)).join('')}
-      </div>
-    </div>`;
-  }
+}
 
-  // 부모 미지정 멤버
-  const orphans = allMembers.filter(m => !m.parent && subtreeMatch(m.id));
+function slotCount(id) {
+  const kids = getKids(id);
+  if (!kids.length) return 1;
+  return kids.reduce((s, k) => s + slotCount(k), 0);
+}
+
+function layoutNode(id, leftSlot, depth, out) {
+  const kids = getKids(id);
+  const slots = slotCount(id);
+  out[id] = { cx: (leftSlot + slots / 2) * (NW + XGAP), y: depth * (NH + YGAP) };
+  let cur = leftSlot;
+  kids.forEach(kid => {
+    const ks = slotCount(kid);
+    layoutNode(kid, cur, depth + 1, out);
+    cur += ks;
+  });
+}
+
+function nodeStyle(m) {
+  if (!m) return { fill: '#f7fafc', stroke: '#e2e8f0', sw: 1, fw: 'normal' };
+  if (m.level === '순장')
+    return m.gender === 'F'
+      ? { fill: '#fce7f3', stroke: '#f9a8d4', sw: 2, fw: 'bold' }
+      : { fill: '#dbeafe', stroke: '#60a5fa', sw: 2, fw: 'bold' };
+  return m.gender === 'F'
+    ? { fill: '#fdf4ff', stroke: '#e9d5ff', sw: 1, fw: 'normal' }
+    : { fill: '#f0f9ff', stroke: '#bae6fd', sw: 1, fw: 'normal' };
+}
+
+function buildSVG(topKids) {
+  if (!topKids.length) return '<p style="color:#a0aec0;padding:20px">멤버 없음</p>';
+  const positions = {};
+  let left = 0;
+  topKids.forEach(kid => {
+    layoutNode(kid, left, 0, positions);
+    left += slotCount(kid);
+  });
+
+  const allNodes = Object.values(positions);
+  const xs = allNodes.map(p => p.cx);
+  const ys = allNodes.map(p => p.y);
+  const minCX = Math.min(...xs), maxCX = Math.max(...xs);
+  const maxY = Math.max(...ys);
+  const PAD = 24;
+  const svgW = maxCX - minCX + NW + PAD * 2;
+  const svgH = maxY + NH + PAD * 2;
+  const offX = -minCX + NW / 2 + PAD;
+  const offY = PAD;
+
+  let edges = '', nodes = '';
+
+  Object.keys(positions).forEach(id => {
+    const pos = positions[id];
+    const px = pos.cx + offX, py = pos.y + offY;
+    getKids(id).forEach(kid => {
+      if (!positions[kid]) return;
+      const kpos = positions[kid];
+      const ex = kpos.cx + offX, ey = kpos.y + offY;
+      const startY = py + NH, midY = (startY + ey) / 2;
+      edges += '<path d="M' + px + ',' + startY + ' C' + px + ',' + midY + ' ' + ex + ',' + midY + ' ' + ex + ',' + ey + '" stroke="#cbd5e0" fill="none" stroke-width="1.5" stroke-linecap="round"/>';
+    });
+  });
+
+  Object.keys(positions).forEach(id => {
+    const m = memberMap[id];
+    if (!m) return;
+    const pos = positions[id];
+    const nx = pos.cx + offX - NW / 2;
+    const ny = pos.y + offY;
+    const s = nodeStyle(m);
+    const gIcon = m.gender === 'M' ? '♂' : '♀';
+    const gColor = m.gender === 'M' ? '#60a5fa' : '#f472b6';
+    const displayName = m.name.length > 5 ? m.name.slice(0, 5) + '…' : m.name;
+    const safeId = id.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const safeIdJs = id.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    nodes += '<g style="cursor:pointer" onmouseenter="showTip(event,\'' + safeIdJs + '\')" onmouseleave="hideTip()">'
+      + '<rect x="' + nx + '" y="' + ny + '" width="' + NW + '" height="' + NH + '" rx="6" fill="' + s.fill + '" stroke="' + s.stroke + '" stroke-width="' + s.sw + '"/>'
+      + '<text x="' + (nx + 9) + '" y="' + (ny + 20) + '" font-size="9" fill="' + gColor + '" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif">' + gIcon + '</text>'
+      + '<text x="' + (pos.cx + offX) + '" y="' + (ny + 20) + '" text-anchor="middle" font-size="11.5" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif" fill="#1a202c" font-weight="' + s.fw + '">' + displayName + '</text>'
+      + '</g>';
+  });
+
+  return '<svg width="' + svgW + '" height="' + svgH + '" xmlns="http://www.w3.org/2000/svg" style="min-width:' + svgW + 'px">' + edges + nodes + '</svg>';
+}
+
+let sectionIndex = 0;
+function render() {
+  const main = document.getElementById('main');
+  let html = '';
+  sectionIndex = 0;
+  externalRoots.forEach(root => {
+    const kids = getKids(root);
+    if (!kids.length) return;
+    const sid = 'sec-' + (sectionIndex++);
+    html += '<div class="root-section">'
+      + '<div class="section-header">'
+      + '<div class="root-title">⛪ ' + root + ' <span style="font-size:.75rem;opacity:.75">(' + kids.length + '명)</span></div>'
+      + '<button class="btn-save" onclick="saveImage(\'' + sid + '\',\'' + root.replace(/'/g,"\\'") + '\')" id="savebtn-' + sid + '">📷 이미지로 저장</button>'
+      + '</div>'
+      + '<div class="svg-wrap" id="' + sid + '">' + buildSVG(kids) + '</div>'
+      + '</div>';
+  });
+  const orphans = allMembers.filter(m => !m.parent).map(m => m.id);
   if (orphans.length) {
-    html += `<div class="root-group">
-      <div class="root-label" style="background:linear-gradient(90deg,#4a5568,#718096)" onclick="toggleRoot('__orphan__')">
-        <span>👤</span><span>부모 미지정</span>
-        <span style="font-size:.72rem;opacity:.72">(${orphans.length}명)</span>
-        <span class="ri">▼</span>
-      </div>
-      <div class="tc" id="rc-__orphan__">
-        ${orphans.map(m => renderNode(m.id, 0)).join('')}
-      </div>
-    </div>`;
+    const sid = 'sec-' + (sectionIndex++);
+    html += '<div class="root-section">'
+      + '<div class="section-header">'
+      + '<div class="root-title" style="background:linear-gradient(90deg,#4a5568,#718096)">👤 부모 미지정 <span style="font-size:.75rem;opacity:.75">(' + orphans.length + '명)</span></div>'
+      + '<button class="btn-save" onclick="saveImage(\'' + sid + '\',\'부모_미지정\')" id="savebtn-' + sid + '">📷 이미지로 저장</button>'
+      + '</div>'
+      + '<div class="svg-wrap" id="' + sid + '">' + buildSVG(orphans) + '</div>'
+      + '</div>';
   }
-
-  if (!html) html = '<div class="empty"><p style="font-size:2rem">🔍</p><p style="margin-top:12px;color:#a0aec0">검색 결과가 없어요.</p></div>';
-  panel.innerHTML = html;
+  if (!html) html = '<p style="text-align:center;color:#a0aec0;padding:60px">데이터가 없어요.</p>';
+  main.innerHTML = html;
 }
 
-function updateStats() {
-  document.getElementById('totalCnt').textContent = allMembers.length;
-  document.getElementById('jangCnt').textContent  = allMembers.filter(m=>m.level==='순장').length;
-  document.getElementById('wonCnt').textContent   = allMembers.filter(m=>m.level==='순원').length;
-  document.getElementById('mCnt').textContent     = allMembers.filter(m=>m.gender==='M').length;
-  document.getElementById('fCnt').textContent     = allMembers.filter(m=>m.gender==='F').length;
+// ── 이미지 저장 ──
+function saveImage(sectionId, label) {
+  const wrap = document.getElementById(sectionId);
+  const btn  = document.getElementById('savebtn-' + sectionId);
+  const svg  = wrap && wrap.querySelector('svg');
+  if (!svg) return;
+
+  btn.classList.add('saving');
+  btn.textContent = '⏳ 저장 중...';
+
+  const svgData = new XMLSerializer().serializeToString(svg);
+  const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  const img = new Image();
+
+  img.onload = function() {
+    const SCALE = 2; // 고해상도 (2×)
+    const canvas = document.createElement('canvas');
+    canvas.width  = img.width  * SCALE;
+    canvas.height = img.height * SCALE;
+    const ctx = canvas.getContext('2d');
+    // 흰 배경
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(SCALE, SCALE);
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+
+    canvas.toBlob(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'CCC_순계보_' + label + '.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+      btn.classList.remove('saving');
+      btn.textContent = '📷 이미지로 저장';
+    }, 'image/png');
+  };
+
+  img.onerror = function() {
+    // SVG에 한글 폰트가 없을 경우 대비: 직접 다운로드
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
+    a.download = 'CCC_순계보_' + label + '.svg';
+    a.click();
+    btn.classList.remove('saving');
+    btn.textContent = '📷 이미지로 저장';
+  };
+
+  img.src = url;
 }
 
-// ══ 상호작용 ════════════════════════════════════════════════════════════════
-function toggleRoot(root) {
-  const label = document.getElementById('rl-'+CSS.escape(root));
-  const child = document.getElementById('rc-'+CSS.escape(root));
-  if (!child) return;
-  const isCol = child.classList.contains('col');
-  child.classList.toggle('col', !isCol);
-  if (label) label.classList.toggle('col', !isCol);
-}
-
-function onNode(id, e) {
-  e.stopPropagation();
-  const child = document.getElementById('c-'+CSS.escape(id));
-  const toggle = document.getElementById('t-'+CSS.escape(id));
-  if (child) {
-    const isOpen = !child.classList.contains('col');
-    child.classList.toggle('col', isOpen);
-    if (toggle) toggle.classList.toggle('op', !isOpen);
-  }
-  if (selectedId === id) {
-    selectedId = null;
-    document.getElementById('detailPanel').classList.add('hidden');
-    document.querySelectorAll('.nc').forEach(c=>c.classList.remove('sel'));
-  } else {
-    selectedId = id;
-    document.querySelectorAll('.nc').forEach(c=>c.classList.remove('sel'));
-    const el = document.getElementById('n-'+CSS.escape(id));
-    if (el) el.classList.add('sel');
-    showDetail(id);
-  }
-}
-
-function showDetail(id) {
+// ── 툴팁 ──
+const tip = document.getElementById('tooltip');
+function showTip(e, id) {
   const m = memberMap[id];
   if (!m) return;
-  document.getElementById('detailPanel').classList.remove('hidden');
-  document.getElementById('dName').textContent = m.name + (m.sabbatical ? ' (휴학)' : '');
-  document.getElementById('dYear').textContent = m.studentYear ? m.studentYear+'학번' : '';
-
-  const kids = childrenMap[id]||[];
-  const parentM = m.parent ? memberMap[m.parent] : null;
-
-  const rows = [
-    ['학과', m.dept||'-'],
-    ['학년', m.grade ? m.grade+'학년' : '-'],
-    ['성별', m.gender==='M'?'♂ 형제':m.gender==='F'?'♀ 자매':'-'],
-    ['전화번호', m.phone||'-'],
-    ['구분', `<span class="badge ${bcls(m.level)}">${m.level||'-'}</span>`],
-    ['활동 정도', m.activity||'-'],
-    ['휴학', m.sabbatical ? '휴학 중' : '재학 중'],
-    ['부모 순장', m.parent
-      ? `<span style="color:${parentM?'#4299e1':'inherit'};cursor:${parentM?'pointer':'default'}" ${parentM?`onclick="jumpTo('${m.parent.replace(/'/g,"\\'")}')"`:''}>${m.parent}</span>`
-      : '-'],
-  ];
-
-  let html = rows.map(([l,v])=>`<div class="detail-row"><span class="dl">${l}</span><span class="dv">${v}</span></div>`).join('');
-
-  if (kids.length) {
-    html += `<div class="kids-section"><h4>내 순원 (${kids.length}명)</h4>`;
-    html += kids.map(kid=>{
-      const km = memberMap[kid]; if(!km) return '';
-      return `<span class="child-chip ${lvcls(km.level)}" onclick="jumpTo('${kid.replace(/'/g,"\\'")}')">
-        ${km.gender==='M'?'<span class="gM" style="font-size:.68rem">♂</span>':'<span class="gF" style="font-size:.68rem">♀</span>'}
-        ${km.name} <small style="opacity:.65">${km.studentYear||''}학번</small>
-      </span>`;
-    }).join('');
-    html += '</div>';
-  }
-
-  document.getElementById('dBody').innerHTML = html;
+  const kids = (childrenMap[id] || []).length;
+  const nameColor = m.gender === 'M' ? '#1d4ed8' : '#be185d';
+  let html = '<div class="tt-name" style="color:' + nameColor + '">' + m.name + (m.sabbatical ? ' <span style="color:#c53030;font-size:.75rem">(휴학)</span>' : '') + '</div>'
+    + '<div class="tt-row">구분: <span>' + m.level + '</span></div>'
+    + '<div class="tt-row">학번: <span>' + (m.studentYear || '-') + '학번</span></div>'
+    + '<div class="tt-row">학과: <span>' + (m.dept || '-') + '</span></div>';
+  if (m.activity) html += '<div class="tt-row">활동: <span>' + m.activity + '</span></div>';
+  if (kids) html += '<div class="tt-row">순원: <span>' + kids + '명</span></div>';
+  if (m.parent) html += '<div class="tt-row">부모순장: <span>' + m.parent + '</span></div>';
+  tip.innerHTML = html;
+  moveTip(e);
+  tip.classList.add('show');
 }
-
-function jumpTo(id) {
-  selectedId = id;
-  renderTree();
-  showDetail(id);
-  setTimeout(()=>{
-    const el = document.getElementById('n-'+CSS.escape(id));
-    if (!el) return;
-    let p = el.parentElement;
-    while(p) {
-      if (p.classList.contains('tc') && p.classList.contains('col')) p.classList.remove('col');
-      p = p.parentElement;
-    }
-    el.classList.add('sel');
-    el.scrollIntoView({behavior:'smooth', block:'center'});
-  }, 80);
+function moveTip(e) {
+  const x = e.clientX + 14, y = e.clientY - 10;
+  tip.style.left = (x + 230 > window.innerWidth ? e.clientX - 234 : x) + 'px';
+  tip.style.top  = (y + 140 > window.innerHeight ? e.clientY - 144 : y) + 'px';
 }
+function hideTip() { tip.classList.remove('show'); }
+document.addEventListener('mousemove', e => { if (tip.classList.contains('show')) moveTip(e); });
 
-function expandAll() {
-  document.querySelectorAll('.tc').forEach(el=>el.classList.remove('col'));
-  document.querySelectorAll('.root-label').forEach(el=>el.classList.remove('col'));
-  document.querySelectorAll('.nt').forEach(el=>el.classList.add('op'));
-}
-function collapseAll() {
-  document.querySelectorAll('.tc').forEach(el=>el.classList.add('col'));
-  document.querySelectorAll('.root-label').forEach(el=>el.classList.add('col'));
-  document.querySelectorAll('.nt').forEach(el=>el.classList.remove('op'));
-}
-
-let debT;
-document.getElementById('searchInput').addEventListener('input', e=>{
-  clearTimeout(debT);
-  debT = setTimeout(()=>{ searchQ = e.target.value.trim(); renderTree(); }, 200);
-});
-document.getElementById('lvFilter').addEventListener('change', e=>{ lvF=e.target.value; renderTree(); });
-document.getElementById('gFilter').addEventListener('change', e=>{ gF=e.target.value; renderTree(); });
-
-// ══ 시작 ════════════════════════════════════════════════════════════════════
-(function init() {
-  const cfg = loadLocal(STORAGE_KEY);
-  if (cfg?.sheetId && cfg.sheets?.length) {
-    document.getElementById('setupOverlay').style.display = 'none';
-    loadData();
-  }
-})();
+loadData();
 </script>
 </body>
 </html>
