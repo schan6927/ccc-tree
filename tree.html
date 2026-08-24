@@ -352,14 +352,10 @@ function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 function escJs(s) { return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 
 function buildMindMap(rootId, topKids) {
-  // 슬롯 수 기준으로 좌우 분할
-  var total = topKids.reduce(function(s,k){return s+slotCount(k);},0);
-  var rightKids = [], leftKids = [], rightSlots = 0;
-  topKids.forEach(function(k) {
-    if (rightSlots < total / 2) { rightKids.push(k); rightSlots += slotCount(k); }
-    else leftKids.push(k);
-  });
-  // 한쪽만 있으면 오른쪽으로
+  // 개수 기준으로 좌우 균등 분할 (절반씩)
+  var half = Math.ceil(topKids.length / 2);
+  var rightKids = topKids.slice(0, half);
+  var leftKids  = topKids.slice(half);
   if (!rightKids.length) { rightKids = leftKids; leftKids = []; }
 
   var positions = {};
