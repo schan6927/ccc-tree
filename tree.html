@@ -246,6 +246,7 @@ function parseSheet(table, sheetName) {
     name: idx('이름'), parent: idx('부모 순장'), dept: idx('학과'),
     grade: idx('학년'), year: idx('학번'), phone: idx('전화번호'),
     level: idx('순원 여부'), activity: idx('활동 정도'), sabbatical: idx('휴학 여부'),
+    birth: idx('출생년도'),
   };
   function cell(row, ci) {
     if (ci < 0 || !row.c || !row.c[ci]) return '';
@@ -269,11 +270,17 @@ function parseSheet(table, sheetName) {
     var cleanN = name.replace(/\d+$/, '').trim();
     var parentRaw = cell(row, C.parent).trim().replace(/\d+$/, '').trim();
     var sabbVal = (row.c && row.c[C.sabbatical]) ? row.c[C.sabbatical].v : null;
+    var yearNum = numVal(row, C.year);
+    var yearStr = fmtYear(yearNum);
+    // 출생년도: 시트에 있으면 사용, 없으면 학번으로 추정 (학번+1981, 끝 2자리)
+    var birthRaw = C.birth >= 0 ? cell(row, C.birth).trim() : '';
+    var birthYear = birthRaw || (yearNum ? String((Math.floor(yearNum) + 1981) % 100).padStart(2,'0') : '');
     allMembers.push({
       id: cleanN || name, rawName: name, name: cleanN || name,
       dept: cell(row, C.dept), grade: cell(row, C.grade),
       gender: autoGender,
-      studentYear: fmtYear(numVal(row, C.year)),
+      studentYear: yearStr,
+      birthYear: birthYear,
       phone: cell(row, C.phone),
       level: cell(row, C.level) || '순원',
       activity: cell(row, C.activity),
@@ -302,7 +309,7 @@ function build() {
 }
 
 // ── 마인드맵 레이아웃 (간사님 중심, 좌우 펼침) ──
-var NW = 108, NH = 22, H_GAP = 20, V_GAP = 5;
+var NW = 96, NH = 40, H_GAP = 24, V_GAP = 5;
 var ROOT_W = 100, ROOT_H = 32;
 
 function getKids(id) {
@@ -464,23 +471,23 @@ function buildMindMap(rootId, topKids) {
       else                  { fill='#f0f9ff'; stroke='#bae6fd'; sw=1; fw='normal'; tc='#075985'; }
     }
     var gColor = m.gender === 'M' ? '#60a5fa' : '#f472b6';
-    // 학번: 숫자만 (예: "24")
-    var yr = m.studentYear ? String(m.studentYear) : '';
-    // 학년: 숫자만 추출 후 2자리 (예: "3학년" → "03")
-    var grNum = m.grade ? m.grade.replace(/[^0-9]/g,'') : '';
-    var gr = grNum ? (grNum.length < 2 ? '0'+grNum : grNum) : '';
-    var label = [yr, gr, m.name].filter(Boolean).join('/');
+    var topLine = [m.studentYear, m.birthYear].filter(Boolean).join(' / ');
+    var displayName = m.name;
     var sid = escJs(id);
     var cx = nx + NW/2;
     nodes += '<g style="cursor:pointer" onmouseenter="showTip(event,\'' + sid + '\')" onmouseleave="hideTip()">'
       + '<rect x="' + nx + '" y="' + ny + '" width="' + NW + '" height="' + NH + '"'
       + ' rx="5" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + sw + '"/>'
-      // 성별 점 (왼쪽 작은 원)
-      + '<circle cx="' + (nx+7) + '" cy="' + (ny+NH/2) + '" r="3" fill="' + gColor + '" opacity="0.8"/>'
-      // 한 줄 레이블: 학번/학년/이름
-      + '<text x="' + (nx+15) + '" y="' + (ny+NH/2+4) + '"'
-      + ' font-size="11" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif"'
-      + ' fill="' + tc + '" font-weight="' + fw + '">' + esc(label) + '</text>'
+      // 1번째 줄: 학번 / 출생년도 (작게, 흐리게)
+      + '<text x="' + cx + '" y="' + (ny+14) + '"'
+      + ' text-anchor="middle" font-size="9.5" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif"'
+      + ' fill="' + tc + '" opacity="0.7">' + esc(topLine) + '</text>'
+      // 2번째 줄: 이름 (굵게)
+      + '<text x="' + cx + '" y="' + (ny+29) + '"'
+      + ' text-anchor="middle" font-size="12" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif"'
+      + ' fill="' + tc + '" font-weight="bold">'
+      + '<tspan font-size="9" fill="' + gColor + '" dy="0">' + (m.gender==='M'?'♂':'♀') + ' </tspan>'
+      + esc(displayName) + '</text>'
       + '</g>';
   });
 
