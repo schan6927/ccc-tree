@@ -302,7 +302,7 @@ function build() {
 }
 
 // ── 마인드맵 레이아웃 (간사님 중심, 좌우 펼침) ──
-var NW = 74, NH = 46, H_GAP = 30, V_GAP = 5;
+var NW = 108, NH = 22, H_GAP = 20, V_GAP = 5;
 var ROOT_W = 100, ROOT_H = 32;
 
 function getKids(id) {
@@ -463,29 +463,24 @@ function buildMindMap(rootId, topKids) {
       if (m.gender === 'F') { fill='#fdf4ff'; stroke='#e9d5ff'; sw=1; fw='normal'; tc='#6b21a8'; }
       else                  { fill='#f0f9ff'; stroke='#bae6fd'; sw=1; fw='normal'; tc='#075985'; }
     }
-    var gIcon  = m.gender === 'M' ? '♂' : '♀';
     var gColor = m.gender === 'M' ? '#60a5fa' : '#f472b6';
-    var displayName = m.name.length > 4 ? m.name.slice(0,4)+'…' : m.name;
-    var yearTxt  = m.studentYear ? m.studentYear + '학번' : '';
-    var gradeTxt = m.grade || '';
+    // 학번: 숫자만 (예: "24")
+    var yr = m.studentYear ? String(m.studentYear) : '';
+    // 학년: 숫자만 추출 후 2자리 (예: "3학년" → "03")
+    var grNum = m.grade ? m.grade.replace(/[^0-9]/g,'') : '';
+    var gr = grNum ? (grNum.length < 2 ? '0'+grNum : grNum) : '';
+    var label = [yr, gr, m.name].filter(Boolean).join('/');
     var sid = escJs(id);
     var cx = nx + NW/2;
     nodes += '<g style="cursor:pointer" onmouseenter="showTip(event,\'' + sid + '\')" onmouseleave="hideTip()">'
       + '<rect x="' + nx + '" y="' + ny + '" width="' + NW + '" height="' + NH + '"'
       + ' rx="5" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + sw + '"/>'
-      // 학번 (1번째 줄)
-      + '<text x="' + cx + '" y="' + (ny+13) + '"'
-      + ' text-anchor="middle" font-size="9" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif"'
-      + ' fill="' + tc + '" opacity="0.75">' + esc(yearTxt) + '</text>'
-      // 이름 (2번째 줄, 메인)
-      + '<text x="' + cx + '" y="' + (ny+27) + '"'
-      + ' text-anchor="middle" font-size="12" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif"'
-      + ' fill="' + tc + '" font-weight="' + fw + '">'
-      + '<tspan font-size="8" fill="' + gColor + '">' + gIcon + '</tspan> ' + esc(displayName) + '</text>'
-      // 학년 (3번째 줄)
-      + '<text x="' + cx + '" y="' + (ny+40) + '"'
-      + ' text-anchor="middle" font-size="9" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif"'
-      + ' fill="' + tc + '" opacity="0.75">' + esc(gradeTxt) + '</text>'
+      // 성별 점 (왼쪽 작은 원)
+      + '<circle cx="' + (nx+7) + '" cy="' + (ny+NH/2) + '" r="3" fill="' + gColor + '" opacity="0.8"/>'
+      // 한 줄 레이블: 학번/학년/이름
+      + '<text x="' + (nx+15) + '" y="' + (ny+NH/2+4) + '"'
+      + ' font-size="11" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif"'
+      + ' fill="' + tc + '" font-weight="' + fw + '">' + esc(label) + '</text>'
       + '</g>';
   });
 
