@@ -359,10 +359,13 @@ function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 function escJs(s) { return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 
 function buildMindMap(rootId, topKids) {
-  // 개수 기준으로 좌우 균등 분할 (절반씩)
-  var half = Math.ceil(topKids.length / 2);
-  var rightKids = topKids.slice(0, half);
-  var leftKids  = topKids.slice(half);
+  // 슬롯 수 내림차순 정렬 후 번갈아 배분 → 좌우 높이 균형
+  var sorted = topKids.slice().sort(function(a,b){ return slotCount(b)-slotCount(a); });
+  var rightKids = [], leftKids = [], rs = 0, ls = 0;
+  sorted.forEach(function(k) {
+    if (rs <= ls) { rightKids.push(k); rs += slotCount(k); }
+    else          { leftKids.push(k);  ls += slotCount(k); }
+  });
   if (!rightKids.length) { rightKids = leftKids; leftKids = []; }
 
   var positions = {};
@@ -471,7 +474,9 @@ function buildMindMap(rootId, topKids) {
       else                  { fill='#f0f9ff'; stroke='#bae6fd'; sw=1; fw='normal'; tc='#075985'; }
     }
     var gColor = m.gender === 'M' ? '#60a5fa' : '#f472b6';
-    var topLine = [m.studentYear, m.birthYear].filter(Boolean).join(' / ');
+    var yearPart  = m.studentYear ? m.studentYear + '학번' : '';
+    var birthPart = m.birthYear  ? m.birthYear            : '';
+    var topLine   = [yearPart, birthPart].filter(Boolean).join(' / ');
     var displayName = m.name;
     var sid = escJs(id);
     var cx = nx + NW/2;
