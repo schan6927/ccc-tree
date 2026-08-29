@@ -274,6 +274,13 @@ mark { background: #fefcbf; border-radius: 2px; padding: 0 2px; }
 
 <script>
 // ══ 설정 ═══════════════════════════════════════════════════════════════════
+// ┌─────────────────────────────────────────────────────┐
+// │           ★ 여기에 시트 정보를 입력하세요 ★          │
+// └─────────────────────────────────────────────────────┘
+const HARDCODED_URL    = '';                               // Google Sheets 공유 URL (붙여넣기)
+const HARDCODED_SHEETS = ['형제 리스트', '자매 리스트'];   // 시트 탭 이름 (필요시 수정)
+// ──────────────────────────────────────────────────────
+
 const STORAGE_KEY = 'ccc_sheet_config_v2';
 let SHEET_ID = '';
 
@@ -329,10 +336,19 @@ async function fetchSheet(sheetId, sheetName) {
 }
 
 async function loadData(forceRefresh = false) {
-  const cfg = loadLocal(STORAGE_KEY);
-  if (!cfg?.sheetId) { showSetup(); return; }
-  SHEET_ID = cfg.sheetId;
-  const sheets = cfg.sheets || ['형제 리스트', '자매 리스트'];
+  // 하드코딩된 URL이 있으면 우선 사용, 없으면 저장된 설정 사용
+  let sheetId, sheets;
+  if (HARDCODED_URL) {
+    sheetId = extractSheetId(HARDCODED_URL);
+    sheets  = HARDCODED_SHEETS;
+  } else {
+    const cfg = loadLocal(STORAGE_KEY);
+    if (!cfg?.sheetId) { showSetup(); return; }
+    sheetId = cfg.sheetId;
+    sheets  = cfg.sheets || ['형제 리스트', '자매 리스트'];
+  }
+  if (!sheetId) { showSetup(); return; }
+  SHEET_ID = sheetId;
 
   document.getElementById('treePanel').innerHTML = '<div class="loading"><div class="spinner"></div><span>Google Sheets에서 불러오는 중...</span></div>';
   document.getElementById('headerSubtitle').textContent = '데이터 로딩 중...';
@@ -716,6 +732,11 @@ document.getElementById('gFilter').addEventListener('change', e=>{ gF=e.target.v
 
 // ══ 시작 ════════════════════════════════════════════════════════════════════
 (function init() {
+  if (HARDCODED_URL) {
+    document.getElementById('setupOverlay').style.display = 'none';
+    loadData();
+    return;
+  }
   const cfg = loadLocal(STORAGE_KEY);
   if (cfg?.sheetId && cfg.sheets?.length) {
     document.getElementById('setupOverlay').style.display = 'none';

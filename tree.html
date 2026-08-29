@@ -161,6 +161,13 @@ body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-ser
 <div class="tooltip" id="tooltip"></div>
 
 <script>
+// ┌─────────────────────────────────────────────────────┐
+// │           ★ 여기에 시트 정보를 입력하세요 ★          │
+// └─────────────────────────────────────────────────────┘
+var HARDCODED_URL   = '';                              // Google Sheets 공유 URL (붙여넣기)
+var HARDCODED_SHEETS = ['형제 리스트', '자매 리스트']; // 시트 탭 이름 (필요시 수정)
+// ──────────────────────────────────────────────────────
+
 const STORAGE_KEY = 'ccc_sheet_config_v2';
 let zoomLevel = 60;
 const ZOOM_STEPS = [30,40,50,60,70,80,90,100,110,125,150,175,200];
@@ -215,12 +222,23 @@ async function fetchSheet(sheetId, sheetName) {
 }
 
 async function loadData() {
-  var cfg = loadLocal(STORAGE_KEY);
-  if (!cfg || !cfg.sheetId) { document.getElementById('setupOverlay').style.display = 'flex'; return; }
-  var sheets = cfg.sheets || ['형제 리스트', '자매 리스트'];
+  // 하드코딩된 URL이 있으면 우선 사용, 없으면 저장된 설정 사용
+  var sheetId, sheets;
+  if (HARDCODED_URL) {
+    sheetId = extractSheetId(HARDCODED_URL);
+    sheets  = HARDCODED_SHEETS;
+  } else {
+    var cfg = loadLocal(STORAGE_KEY);
+    if (!cfg || !cfg.sheetId) { document.getElementById('setupOverlay').style.display = 'flex'; return; }
+    sheetId = cfg.sheetId;
+    sheets  = cfg.sheets || ['형제 리스트', '자매 리스트'];
+  }
+  if (!sheetId) { document.getElementById('setupOverlay').style.display = 'flex'; return; }
+  var cfg = { sheetId: sheetId }; // 하위 코드 호환용
+  void cfg;
   document.getElementById('main').innerHTML = '<div class="loading"><div class="spinner"></div><span>Google Sheets에서 불러오는 중...</span></div>';
   try {
-    var results = await Promise.allSettled(sheets.map(function(s) { return fetchSheet(cfg.sheetId, s); }));
+    var results = await Promise.allSettled(sheets.map(function(s) { return fetchSheet(sheetId, s); }));
     allMembers = [];
     results.forEach(function(r, i) { if (r.status === 'fulfilled') parseSheet(r.value, sheets[i]); });
     if (!allMembers.length) throw new Error('데이터가 없어요. 시트 탭 이름을 확인해주세요.');
@@ -309,7 +327,7 @@ function build() {
 }
 
 // ── 마인드맵 레이아웃 (간사님 중심, 좌우 펼침) ──
-var NW = 96, NH = 40, H_GAP = 24, V_GAP = 5;
+var NW = 112, NH = 40, H_GAP = 20, V_GAP = 5;
 var ROOT_W = 100, ROOT_H = 32;
 
 function getKids(id) {
@@ -477,7 +495,8 @@ function buildMindMap(rootId, topKids) {
     var yearPart  = m.studentYear ? m.studentYear + '학번' : '';
     var birthPart = m.birthYear  ? m.birthYear            : '';
     var topLine   = [yearPart, birthPart].filter(Boolean).join(' / ');
-    var displayName = m.name;
+    var deptShort = m.dept ? m.dept.replace(/학과$|학부$|전공$/, '') : '';
+    var displayName = m.name + (deptShort ? '(' + deptShort + ')' : '');
     var sid = escJs(id);
     var cx = nx + NW/2;
     nodes += '<g style="cursor:pointer" onmouseenter="showTip(event,\'' + sid + '\')" onmouseleave="hideTip()">'
@@ -492,7 +511,9 @@ function buildMindMap(rootId, topKids) {
       + ' text-anchor="middle" font-size="12" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif"'
       + ' fill="' + tc + '" font-weight="bold">'
       + '<tspan font-size="9" fill="' + gColor + '" dy="0">' + (m.gender==='M'?'♂':'♀') + ' </tspan>'
-      + esc(displayName) + '</text>'
+      + '<tspan font-size="11">' + esc(m.name) + '</tspan>'
+      + (deptShort ? '<tspan font-size="9.5" opacity="0.7">(' + esc(deptShort) + ')</tspan>' : '')
+      + '</text>'
       + '</g>';
   });
 
