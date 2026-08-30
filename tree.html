@@ -30,14 +30,28 @@ body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-ser
   background: white; border-bottom: 1px solid #e2e8f0;
   padding: 8px 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
 }
-.legend { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; font-size: .74rem; }
+
+/* 탭 버튼 */
+.tab-bar { display: flex; gap: 6px; }
+.tab-btn {
+  padding: 5px 14px; border-radius: 20px; border: 1.5px solid #cbd5e0;
+  background: white; color: #4a5568; font-size: .8rem; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.tab-btn:hover { background: #edf2f7; }
+.tab-btn.active-unified  { background: #1a365d; border-color: #1a365d; color: white; }
+.tab-btn.active-brothers { background: #2563eb; border-color: #2563eb; color: white; }
+.tab-btn.active-sisters  { background: #db2777; border-color: #db2777; color: white; }
+.tab-btn.active-staff    { background: #6d28d9; border-color: #6d28d9; color: white; }
+
+.legend { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: .74rem; }
 .leg { display: flex; align-items: center; gap: 4px; }
-.leg-box { width: 12px; height: 12px; border-radius: 3px; border: 2px solid; flex-shrink: 0; }
+.leg-box { width: 11px; height: 11px; border-radius: 3px; border: 2px solid; flex-shrink: 0; }
 
 .zoom-ctrl { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: .76rem; color: #4a5568; }
 .zoom-ctrl button {
   width: 26px; height: 26px; border: 1.5px solid #cbd5e0; background: white;
-  border-radius: 6px; cursor: pointer; font-size: 1rem; line-height: 1;
+  border-radius: 6px; cursor: pointer; font-size: 1rem;
   display: flex; align-items: center; justify-content: center;
 }
 .zoom-ctrl button:hover { background: #edf2f7; }
@@ -45,22 +59,14 @@ body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-ser
 
 .main { padding: 20px; }
 .svg-scroll {
-  overflow: auto;
-  background: white; border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  padding: 24px;
+  overflow: auto; background: white; border-radius: 12px;
+  border: 1px solid #e2e8f0; padding: 24px;
   box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 .svg-inner { transform-origin: top left; transition: transform .15s; display: inline-block; }
 .svg-inner svg { display: block; }
 
 .save-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-.root-lbl {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 6px 16px; border-radius: 20px;
-  background: linear-gradient(90deg, #1a365d, #2b6cb0);
-  color: white; font-weight: 700; font-size: .88rem;
-}
 .btn-save {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 5px 13px; border-radius: 14px;
@@ -70,12 +76,10 @@ body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-ser
 .btn-save:hover { background: #edf2f7; }
 
 .tooltip {
-  position: fixed; z-index: 200;
-  background: white; border: 1px solid #e2e8f0;
+  position: fixed; z-index: 200; background: white; border: 1px solid #e2e8f0;
   border-radius: 10px; padding: 10px 14px;
   box-shadow: 0 8px 24px rgba(0,0,0,.12);
-  font-size: .81rem; max-width: 210px;
-  pointer-events: none; opacity: 0; transition: opacity .1s;
+  font-size: .81rem; max-width: 220px; pointer-events: none; opacity: 0; transition: opacity .1s;
 }
 .tooltip.show { opacity: 1; }
 .tt-name { font-size: .92rem; font-weight: 700; margin-bottom: 4px; }
@@ -92,8 +96,7 @@ body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-ser
 @keyframes spin { to { transform: rotate(360deg); } }
 .error-box {
   background: #fff5f5; border: 1px solid #fed7d7; border-radius: 10px;
-  padding: 20px 24px; max-width: 460px; margin: 40px auto;
-  text-align: center; color: #c53030;
+  padding: 20px 24px; max-width: 460px; margin: 40px auto; text-align: center; color: #c53030;
 }
 .setup-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.55);
@@ -118,12 +121,11 @@ body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-ser
 <div class="setup-overlay" id="setupOverlay" style="display:none">
   <div class="setup-card">
     <h2>⛪ 순계보 트리뷰어</h2>
-    <p>메인 뷰어에서 한 번 설정하면 자동으로 연결돼요.<br>
-       아직 설정하지 않았다면 Google Sheets URL을 입력해주세요.</p>
+    <p>메인 뷰어에서 한 번 설정하면 자동으로 연결돼요.</p>
     <input class="url-input" type="text" id="sheetUrlInput" placeholder="Google Sheets URL...">
     <div style="display:flex;gap:8px;margin-top:8px">
-      <input class="url-input" type="text" id="sheet1Input" placeholder="형제 시트" style="margin-top:0;flex:1" value="형제 리스트">
-      <input class="url-input" type="text" id="sheet2Input" placeholder="자매 시트" style="margin-top:0;flex:1" value="자매 리스트">
+      <input class="url-input" type="text" id="sheet1Input" style="margin-top:0;flex:1" value="형제 리스트">
+      <input class="url-input" type="text" id="sheet2Input" style="margin-top:0;flex:1" value="자매 리스트">
     </div>
     <button class="setup-btn" onclick="saveConfig()">연결하기</button>
   </div>
@@ -139,14 +141,24 @@ body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-ser
 </header>
 
 <div class="toolbar">
+  <!-- 탭 -->
+  <div class="tab-bar">
+    <button id="tab-unified"  class="tab-btn" onclick="setView('unified')">🌐 통합뷰</button>
+    <button id="tab-brothers" class="tab-btn" onclick="setView('brothers')">💙 형제순장</button>
+    <button id="tab-sisters"  class="tab-btn" onclick="setView('sisters')">💗 자매순장</button>
+    <button id="tab-staff"    class="tab-btn" onclick="setView('staff')">🎓 이종태 간사님</button>
+  </div>
+  <!-- 범례 -->
   <div class="legend">
-    <strong style="color:#4a5568">색상:</strong>
-    <div class="leg"><div class="leg-box" style="background:#1a365d;border-color:#1a365d"></div> 간사님</div>
+    <div class="leg"><div class="leg-box" style="background:#0f2744;border-color:#0f2744"></div> 총간사님</div>
+    <div class="leg"><div class="leg-box" style="background:#1e4080;border-color:#1e4080"></div> 간사님</div>
     <div class="leg"><div class="leg-box" style="background:#dbeafe;border-color:#60a5fa"></div> 형제 순장</div>
     <div class="leg"><div class="leg-box" style="background:#fce7f3;border-color:#f9a8d4"></div> 자매 순장</div>
     <div class="leg"><div class="leg-box" style="background:#f0f9ff;border-color:#bae6fd"></div> 형제 순원</div>
     <div class="leg"><div class="leg-box" style="background:#fdf4ff;border-color:#e9d5ff"></div> 자매 순원</div>
+    <div class="leg"><div class="leg-box" style="background:#ede9fe;border-color:#a78bfa"></div> 간사님 직속</div>
   </div>
+  <!-- 줌 -->
   <div class="zoom-ctrl">
     <button onclick="zoom(-1)">−</button>
     <span id="zoomLabel">60%</span>
@@ -164,18 +176,27 @@ body { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-ser
 // ┌─────────────────────────────────────────────────────┐
 // │           ★ 여기에 시트 정보를 입력하세요 ★          │
 // └─────────────────────────────────────────────────────┘
-var HARDCODED_URL   = 'https://docs.google.com/spreadsheets/d/1Kz_dVaMGFgaHZmoqxUWo7VkSb1UqqXz8geYZnzmUFIU/edit?hl=ko&gid=0#gid=0';                              // Google Sheets 공유 URL (붙여넣기)
-var HARDCODED_SHEETS = ['형제 리스트', '자매 리스트']; // 시트 탭 이름 (필요시 수정)
+var HARDCODED_URL    = 'https://docs.google.com/spreadsheets/d/1Kz_dVaMGFgaHZmoqxUWo7VkSb1UqqXz8geYZnzmUFIU/edit';
+var SHEET_BROTHERS   = '형제 리스트';   // 형제 시트 이름
+var SHEET_SISTERS    = '자매 리스트';   // 자매 시트 이름
+var SHEET_STAFF      = '간사님 직속';   // 간사님 직속 시트 이름
 // ──────────────────────────────────────────────────────
 
 const STORAGE_KEY = 'ccc_sheet_config_v2';
-let zoomLevel = 60;
+var currentView = 'unified';
+var zoomLevel = 60;
 const ZOOM_STEPS = [30,40,50,60,70,80,90,100,110,125,150,175,200];
 
+// 시트별 멤버 저장
+var sourceData = {}; // { 'brothers': [...], 'sisters': [...], 'staff': [...] }
+
+// 현재 뷰 데이터
+var memberMap = {}, childrenMap = {}, externalRoots = [], allMembers = [];
+
+// ── 줌 ──
 function zoom(dir) {
   var idx = ZOOM_STEPS.indexOf(zoomLevel);
-  var next = ZOOM_STEPS[Math.max(0, Math.min(ZOOM_STEPS.length-1, idx+dir))];
-  setZoom(next);
+  setZoom(ZOOM_STEPS[Math.max(0, Math.min(ZOOM_STEPS.length-1, idx+dir))]);
 }
 function setZoom(z) {
   zoomLevel = z;
@@ -191,9 +212,18 @@ function setZoom(z) {
 }
 function resetZoom() { setZoom(60); }
 
-function loadLocal(k) {
-  try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e) { return null; }
+// ── 탭 ──
+function setView(v) {
+  currentView = v;
+  ['unified','brothers','sisters','staff'].forEach(function(id) {
+    var btn = document.getElementById('tab-'+id);
+    btn.className = 'tab-btn' + (id === v ? ' active-'+id : '');
+  });
+  buildAndRender();
 }
+
+// ── 로컬 스토리지 ──
+function loadLocal(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e) { return null; } }
 function saveLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
 function extractSheetId(url) {
   var m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
@@ -203,68 +233,69 @@ function saveConfig() {
   var url = document.getElementById('sheetUrlInput').value.trim();
   var id = extractSheetId(url);
   if (!id) { alert('올바른 URL이 아닌 것 같아요.'); return; }
-  var s1 = document.getElementById('sheet1Input').value.trim();
-  var s2 = document.getElementById('sheet2Input').value.trim();
-  saveLocal(STORAGE_KEY, { sheetId: id, sheets: [s1,s2].filter(Boolean) });
+  saveLocal(STORAGE_KEY, { sheetId: id });
   document.getElementById('setupOverlay').style.display = 'none';
   loadData();
 }
 
-var memberMap = {}, childrenMap = {}, externalRoots = [], allMembers = [];
-
+// ── 데이터 로드 ──
 async function fetchSheet(sheetId, sheetName) {
-  var url = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(sheetName) + '&t=' + Date.now();
+  var url = 'https://docs.google.com/spreadsheets/d/' + sheetId +
+            '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(sheetName) + '&t=' + Date.now();
   var res = await fetch(url);
   var text = await res.text();
   var json = JSON.parse(text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
-  if (json.status === 'error') throw new Error(json.errors && json.errors[0] ? json.errors[0].message : '불러오기 실패');
+  if (json.status === 'error') throw new Error(json.errors?.[0]?.message || '불러오기 실패');
   return json.table;
 }
 
 async function loadData() {
-  // 하드코딩된 URL이 있으면 우선 사용, 없으면 저장된 설정 사용
-  var sheetId, sheets;
+  var sheetId;
   if (HARDCODED_URL) {
     sheetId = extractSheetId(HARDCODED_URL);
-    sheets  = HARDCODED_SHEETS;
   } else {
     var cfg = loadLocal(STORAGE_KEY);
-    if (!cfg || !cfg.sheetId) { document.getElementById('setupOverlay').style.display = 'flex'; return; }
+    if (!cfg?.sheetId) { document.getElementById('setupOverlay').style.display = 'flex'; return; }
     sheetId = cfg.sheetId;
-    sheets  = cfg.sheets || ['형제 리스트', '자매 리스트'];
   }
   if (!sheetId) { document.getElementById('setupOverlay').style.display = 'flex'; return; }
-  var cfg = { sheetId: sheetId }; // 하위 코드 호환용
-  void cfg;
+
   document.getElementById('main').innerHTML = '<div class="loading"><div class="spinner"></div><span>Google Sheets에서 불러오는 중...</span></div>';
+
   try {
-    var results = await Promise.allSettled(sheets.map(function(s) { return fetchSheet(sheetId, s); }));
-    allMembers = [];
-    results.forEach(function(r, i) { if (r.status === 'fulfilled') parseSheet(r.value, sheets[i]); });
-    if (!allMembers.length) throw new Error('데이터가 없어요. 시트 탭 이름을 확인해주세요.');
-    build();
-    render();
-    var loaded = sheets.filter(function(_,i){ return results[i].status==='fulfilled'; });
-    document.getElementById('hdrSub').textContent = '총 ' + allMembers.length + '명 · ' + loaded.join(' + ');
+    var results = await Promise.allSettled([
+      fetchSheet(sheetId, SHEET_BROTHERS),
+      fetchSheet(sheetId, SHEET_SISTERS),
+      fetchSheet(sheetId, SHEET_STAFF),
+    ]);
+
+    sourceData = {};
+    if (results[0].status === 'fulfilled') sourceData.brothers = parseSheet(results[0].value, SHEET_BROTHERS);
+    if (results[1].status === 'fulfilled') sourceData.sisters  = parseSheet(results[1].value, SHEET_SISTERS);
+    if (results[2].status === 'fulfilled') sourceData.staff    = parseSheet(results[2].value, SHEET_STAFF);
+
+    var total = (sourceData.brothers||[]).length + (sourceData.sisters||[]).length;
+    document.getElementById('hdrSub').textContent = '총 ' + total + '명 로드됨';
+
+    setView(currentView);
   } catch(e) {
     document.getElementById('main').innerHTML =
       '<div class="error-box"><p style="font-size:1.4rem;margin-bottom:8px">⚠️</p>'
       + '<p><strong>불러오기 실패</strong></p>'
-      + '<p style="margin-top:8px;font-size:.84rem">' + e.message + '</p>'
-      + '<button onclick="document.getElementById(\'setupOverlay\').style.display=\'flex\'"'
-      + ' style="margin-top:14px;padding:8px 20px;background:#2b6cb0;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600">설정 다시 하기</button></div>';
+      + '<p style="margin-top:8px;font-size:.84rem">' + e.message + '</p></div>';
   }
 }
 
 function parseSheet(table, sheetName) {
   var autoGender = sheetName.indexOf('형제') >= 0 ? 'M' : sheetName.indexOf('자매') >= 0 ? 'F' : '';
+  var isStaff = sheetName === SHEET_STAFF;
   var cols = table.cols.map(function(c) { return c.label.trim(); });
   var idx = function(n) { return cols.indexOf(n); };
   var C = {
     name: idx('이름'), parent: idx('부모 순장'), dept: idx('학과'),
     grade: idx('학년'), year: idx('학번'), phone: idx('전화번호'),
     level: idx('순원 여부'), activity: idx('활동 정도'), sabbatical: idx('휴학 여부'),
-    birth: idx('출생년도'),
+    gender: idx('성별'), birth: idx('출생년도'),
   };
   function cell(row, ci) {
     if (ci < 0 || !row.c || !row.c[ci]) return '';
@@ -282,30 +313,53 @@ function parseSheet(table, sheetName) {
     var i = Math.floor(n), f = Math.round((n - i) * 10);
     return f === 0 ? String(i) : (i + '.' + f);
   }
+  var members = [];
   table.rows.forEach(function(row) {
     var name = cell(row, C.name).trim();
     if (!name) return;
     var cleanN = name.replace(/\d+$/, '').trim();
     var parentRaw = cell(row, C.parent).trim().replace(/\d+$/, '').trim();
     var sabbVal = (row.c && row.c[C.sabbatical]) ? row.c[C.sabbatical].v : null;
+    var genderCell = C.gender >= 0 ? cell(row, C.gender).trim() : '';
+    var gender = genderCell === '남' || genderCell === 'M' ? 'M'
+               : genderCell === '여' || genderCell === 'F' ? 'F'
+               : autoGender;
     var yearNum = numVal(row, C.year);
     var yearStr = fmtYear(yearNum);
-    // 출생년도: 시트에 있으면 사용, 없으면 학번으로 추정 (학번+1981, 끝 2자리)
     var birthRaw = C.birth >= 0 ? cell(row, C.birth).trim() : '';
     var birthYear = birthRaw || (yearNum ? String((Math.floor(yearNum) + 1981) % 100).padStart(2,'0') : '');
-    allMembers.push({
+    var levelRaw = cell(row, C.level);
+    // 간사님 직속 시트: 순원 여부 칸을 그대로 사용, 없으면 '간사님직속'
+    var level = isStaff ? (levelRaw || '간사님직속') : (levelRaw || '순원');
+    members.push({
       id: cleanN || name, rawName: name, name: cleanN || name,
       dept: cell(row, C.dept), grade: cell(row, C.grade),
-      gender: autoGender,
-      studentYear: yearStr,
-      birthYear: birthYear,
+      gender: gender,
+      studentYear: yearStr, birthYear: birthYear,
       phone: cell(row, C.phone),
-      level: cell(row, C.level) || '순원',
+      level: level,
       activity: cell(row, C.activity),
       sabbatical: sabbVal === true || String(sabbVal).toLowerCase() === 'true',
       parent: parentRaw || null,
+      isStaff: isStaff,
     });
   });
+  return members;
+}
+
+// ── 뷰 전환 ──
+function buildAndRender() {
+  if (currentView === 'unified') {
+    allMembers = [].concat(sourceData.staff || [], sourceData.brothers || [], sourceData.sisters || []);
+  } else if (currentView === 'brothers') {
+    allMembers = sourceData.brothers || [];
+  } else if (currentView === 'sisters') {
+    allMembers = sourceData.sisters || [];
+  } else { // staff
+    allMembers = sourceData.staff || [];
+  }
+  build();
+  render();
 }
 
 function build() {
@@ -326,33 +380,25 @@ function build() {
   externalRoots = Object.keys(allParents).filter(function(p) { return !mSet[p]; }).sort();
 }
 
-// ── 마인드맵 레이아웃 (간사님 중심, 좌우 펼침) ──
+// ── 마인드맵 레이아웃 ──
 var NW = 130, NH = 40, H_GAP = 18, V_GAP = 5;
-var ROOT_W = 100, ROOT_H = 32;
+var ROOT_W = 110, ROOT_H = 34;
 
 function getKids(id) {
   var kids = (childrenMap[id] || []).filter(function(k) { return memberMap[k]; });
   kids.sort(function(a, b) {
-    var lo = {'순장': 0, '순원': 1};
-    var la = memberMap[a] ? (lo[memberMap[a].level] != null ? lo[memberMap[a].level] : 2) : 2;
-    var lb = memberMap[b] ? (lo[memberMap[b].level] != null ? lo[memberMap[b].level] : 2) : 2;
+    var lo = {'간사님':0,'순장':1,'순원':2};
+    var la = memberMap[a] ? (lo[memberMap[a].level] != null ? lo[memberMap[a].level] : 3) : 3;
+    var lb = memberMap[b] ? (lo[memberMap[b].level] != null ? lo[memberMap[b].level] : 3) : 3;
     return la - lb;
   });
   return kids;
 }
-
 function slotCount(id) {
   var kids = getKids(id);
   if (!kids.length) return 1;
-  return kids.reduce(function(s, k) { return s + slotCount(k); }, 0);
+  return kids.reduce(function(s,k){ return s + slotCount(k); }, 0);
 }
-
-// 한 방향 레이아웃
-// ids: 이 레벨 노드들
-// dir: 'right' | 'left'
-// startX: 노드 박스 왼쪽 끝 x (루트 중심=0 기준)
-// startY: 이 그룹의 위쪽 y
-// positions: {id: {x, cy, dir}}
 function layoutSide(ids, dir, startX, startY, positions) {
   var curY = startY;
   for (var i = 0; i < ids.length; i++) {
@@ -373,11 +419,11 @@ function layoutSide(ids, dir, startX, startY, positions) {
   }
 }
 
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function escJs(s) { return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escJs(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 
 function buildMindMap(rootId, topKids) {
-  // 슬롯 수 내림차순 정렬 후 번갈아 배분 → 좌우 높이 균형
+  // 슬롯 수 내림차순으로 좌우 균형 배분
   var sorted = topKids.slice().sort(function(a,b){ return slotCount(b)-slotCount(a); });
   var rightKids = [], leftKids = [], rs = 0, ls = 0;
   sorted.forEach(function(k) {
@@ -387,93 +433,65 @@ function buildMindMap(rootId, topKids) {
   if (!rightKids.length) { rightKids = leftKids; leftKids = []; }
 
   var positions = {};
-
-  // 오른쪽 레이아웃 (startX = 루트 오른쪽에서 H_GAP 떨어진 곳)
   var rightSlotTotal = rightKids.reduce(function(s,k){return s+slotCount(k);},0);
-  var rightH = rightSlotTotal * (NH + V_GAP) - V_GAP;
-  var rightStartX = ROOT_W/2 + H_GAP;
-  layoutSide(rightKids, 'right', rightStartX, -rightH/2, positions);
+  var rightH = rightSlotTotal * (NH+V_GAP) - V_GAP;
+  layoutSide(rightKids, 'right', ROOT_W/2 + H_GAP, -rightH/2, positions);
 
-  // 왼쪽 레이아웃
   if (leftKids.length) {
     var leftSlotTotal = leftKids.reduce(function(s,k){return s+slotCount(k);},0);
-    var leftH = leftSlotTotal * (NH + V_GAP) - V_GAP;
-    var leftStartX = -(ROOT_W/2 + H_GAP + NW);
-    layoutSide(leftKids, 'left', leftStartX, -leftH/2, positions);
+    var leftH = leftSlotTotal * (NH+V_GAP) - V_GAP;
+    layoutSide(leftKids, 'left', -(ROOT_W/2 + H_GAP + NW), -leftH/2, positions);
   }
 
-  // 바운딩 박스 계산 (루트 중심=0 기준)
   var allP = Object.values(positions);
-  var minX  = allP.length ? Math.min.apply(null, allP.map(function(p){return p.x;}))     : -ROOT_W/2;
-  var maxX  = allP.length ? Math.max.apply(null, allP.map(function(p){return p.x+NW;}))  : ROOT_W/2;
-  var minCY = allP.length ? Math.min.apply(null, allP.map(function(p){return p.cy-NH/2;})): -ROOT_H/2;
-  var maxCY = allP.length ? Math.max.apply(null, allP.map(function(p){return p.cy+NH/2;})): ROOT_H/2;
-  minX  = Math.min(minX,  -ROOT_W/2);
-  maxX  = Math.max(maxX,   ROOT_W/2);
-  minCY = Math.min(minCY, -ROOT_H/2);
-  maxCY = Math.max(maxCY,  ROOT_H/2);
+  var minX  = allP.length ? Math.min.apply(null, allP.map(function(p){return p.x;})) : -ROOT_W/2;
+  var maxX  = allP.length ? Math.max.apply(null, allP.map(function(p){return p.x+NW;})) : ROOT_W/2;
+  var minCY = allP.length ? Math.min.apply(null, allP.map(function(p){return p.cy-NH/2;})) : -ROOT_H/2;
+  var maxCY = allP.length ? Math.max.apply(null, allP.map(function(p){return p.cy+NH/2;})) : ROOT_H/2;
+  minX  = Math.min(minX,  -ROOT_W/2); maxX  = Math.max(maxX,  ROOT_W/2);
+  minCY = Math.min(minCY, -ROOT_H/2); maxCY = Math.max(maxCY, ROOT_H/2);
 
-  var PAD   = 28;
-  var offX  = -minX + PAD;   // 좌표 → SVG 픽셀 변환 오프셋
-  var offY  = -minCY + PAD;
-  var svgW  = maxX - minX + PAD*2;
-  var svgH  = maxCY - minCY + PAD*2;
-
-  var rootRX  = ROOT_W/2  + offX;  // 루트 오른쪽 엣지 x
-  var rootLX  = -ROOT_W/2 + offX;  // 루트 왼쪽 엣지 x
-  var rootCY  = offY;               // 루트 중심 y
+  var PAD = 28, offX = -minX+PAD, offY = -minCY+PAD;
+  var svgW = maxX-minX+PAD*2, svgH = maxCY-minCY+PAD*2;
+  var rootRX = ROOT_W/2+offX, rootLX = -ROOT_W/2+offX, rootCY = offY;
 
   var edges = '', nodes = '';
 
-  // 루트 → 오른쪽 자식 엣지
+  // 루트 → 오른쪽 엣지
   rightKids.forEach(function(kid) {
     var kp = positions[kid]; if (!kp) return;
-    var kx = kp.x + offX, kcy = kp.cy + offY;
-    var mx = (rootRX + kx) / 2;
-    edges += '<path d="M' + rootRX + ',' + rootCY +
-             ' C' + mx + ',' + rootCY + ' ' + mx + ',' + kcy + ' ' + kx + ',' + kcy +
-             '" stroke="#94a3b8" fill="none" stroke-width="2" stroke-linecap="round"/>';
+    var kx = kp.x+offX, kcy = kp.cy+offY;
+    var mx = (rootRX+kx)/2;
+    edges += '<path d="M'+rootRX+','+rootCY+' C'+mx+','+rootCY+' '+mx+','+kcy+' '+kx+','+kcy+'" stroke="#94a3b8" fill="none" stroke-width="2" stroke-linecap="round"/>';
   });
-
-  // 루트 → 왼쪽 자식 엣지 (왼쪽 노드의 오른쪽 끝에 연결)
+  // 루트 → 왼쪽 엣지
   leftKids.forEach(function(kid) {
     var kp = positions[kid]; if (!kp) return;
-    var kRX = kp.x + NW + offX, kcy = kp.cy + offY;
-    var mx  = (rootLX + kRX) / 2;
-    edges += '<path d="M' + rootLX + ',' + rootCY +
-             ' C' + mx + ',' + rootCY + ' ' + mx + ',' + kcy + ' ' + kRX + ',' + kcy +
-             '" stroke="#94a3b8" fill="none" stroke-width="2" stroke-linecap="round"/>';
+    var kRX = kp.x+NW+offX, kcy = kp.cy+offY;
+    var mx = (rootLX+kRX)/2;
+    edges += '<path d="M'+rootLX+','+rootCY+' C'+mx+','+rootCY+' '+mx+','+kcy+' '+kRX+','+kcy+'" stroke="#94a3b8" fill="none" stroke-width="2" stroke-linecap="round"/>';
   });
-
   // 멤버 → 자식 엣지
   Object.keys(positions).forEach(function(id) {
     var pos = positions[id];
     var isRight = pos.dir === 'right';
-    var px = pos.x + offX, pcy = pos.cy + offY;
-    var parentEdgeX = isRight ? px + NW : px;  // 오른쪽 노드: 우측 끝, 왼쪽 노드: 좌측 끝
-
+    var px = pos.x+offX, pcy = pos.cy+offY;
+    var pEdge = isRight ? px+NW : px;
     getKids(id).forEach(function(kid) {
       var kp = positions[kid]; if (!kp) return;
-      var kx = kp.x + offX, kcy = kp.cy + offY;
-      var childEdgeX = isRight ? kx : kx + NW;
-      var mx = (parentEdgeX + childEdgeX) / 2;
-      edges += '<path d="M' + parentEdgeX + ',' + pcy +
-               ' C' + mx + ',' + pcy + ' ' + mx + ',' + kcy + ' ' + childEdgeX + ',' + kcy +
-               '" stroke="#cbd5e0" fill="none" stroke-width="1.5" stroke-linecap="round"/>';
+      var kx = kp.x+offX, kcy = kp.cy+offY;
+      var kEdge = isRight ? kx : kx+NW;
+      var mx = (pEdge+kEdge)/2;
+      edges += '<path d="M'+pEdge+','+pcy+' C'+mx+','+pcy+' '+mx+','+kcy+' '+kEdge+','+kcy+'" stroke="#cbd5e0" fill="none" stroke-width="1.5" stroke-linecap="round"/>';
     });
   });
 
-  // 루트 노드 (간사님)
+  // 루트 노드 (총간사님)
   if (rootId) {
-    var rnx = -ROOT_W/2 + offX, rny = -ROOT_H/2 + offY;
-    var rootLabel = rootId.length > 9 ? rootId.slice(0,9)+'…' : rootId;
+    var rnx = -ROOT_W/2+offX, rny = -ROOT_H/2+offY;
     nodes += '<g>'
-      + '<rect x="' + rnx + '" y="' + rny + '" width="' + ROOT_W + '" height="' + ROOT_H + '"'
-      + ' rx="9" fill="#1a365d" stroke="#1a365d"/>'
-      + '<text x="' + (rnx + ROOT_W/2) + '" y="' + (rny + ROOT_H/2 + 5) + '"'
-      + ' text-anchor="middle" font-size="13" font-weight="bold"'
-      + ' font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif" fill="white">'
-      + esc(rootLabel) + '</text>'
+      + '<rect x="'+rnx+'" y="'+rny+'" width="'+ROOT_W+'" height="'+ROOT_H+'" rx="9" fill="#0f2744" stroke="#0f2744"/>'
+      + '<text x="'+(rnx+ROOT_W/2)+'" y="'+(rny+ROOT_H/2+5)+'" text-anchor="middle" font-size="13" font-weight="bold" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif" fill="white">'+esc(rootId)+'</text>'
       + '</g>';
   }
 
@@ -481,42 +499,44 @@ function buildMindMap(rootId, topKids) {
   Object.keys(positions).forEach(function(id) {
     var m = memberMap[id]; if (!m) return;
     var pos = positions[id];
-    var nx = pos.x + offX, ny = pos.cy + offY - NH/2;
-    var isJang = m.level === '순장';
-    var fill, stroke, sw, fw, tc;
-    if (isJang) {
-      if (m.gender === 'F') { fill='#fce7f3'; stroke='#f9a8d4'; sw=2; fw='bold';   tc='#831843'; }
-      else                  { fill='#dbeafe'; stroke='#60a5fa'; sw=2; fw='bold';   tc='#1e3a8a'; }
+    var nx = pos.x+offX, ny = pos.cy+offY-NH/2;
+    var cx2 = nx+NW/2;
+
+    // 색상 결정
+    var fill, stroke, sw, tc, gColor;
+    if (m.level === '간사님') {
+      fill='#1e3a7a'; stroke='#1e3a7a'; sw=2; tc='white';
+      gColor = m.gender==='F' ? '#f9a8d4' : '#93c5fd';
+    } else if (m.level === '순장') {
+      if (m.gender==='F') { fill='#fce7f3'; stroke='#f9a8d4'; sw=2; tc='#831843'; gColor='#f472b6'; }
+      else                { fill='#dbeafe'; stroke='#60a5fa'; sw=2; tc='#1e3a8a'; gColor='#60a5fa'; }
+    } else if (m.level === '간사님직속') {
+      // 대학원생 등 간사님 직속 (성별 무관)
+      fill='#ede9fe'; stroke='#a78bfa'; sw=1.5; tc='#4c1d95';
+      gColor = m.gender==='M' ? '#818cf8' : m.gender==='F' ? '#f472b6' : '#a78bfa';
     } else {
-      if (m.gender === 'F') { fill='#fdf4ff'; stroke='#e9d5ff'; sw=1; fw='normal'; tc='#6b21a8'; }
-      else                  { fill='#f0f9ff'; stroke='#bae6fd'; sw=1; fw='normal'; tc='#075985'; }
+      if (m.gender==='F') { fill='#fdf4ff'; stroke='#e9d5ff'; sw=1; tc='#6b21a8'; gColor='#f472b6'; }
+      else                { fill='#f0f9ff'; stroke='#bae6fd'; sw=1; tc='#075985'; gColor='#60a5fa'; }
     }
-    var gColor = m.gender === 'M' ? '#60a5fa' : '#f472b6';
-    var yearPart  = m.studentYear ? m.studentYear + '학번' : '';
-    var birthPart = m.birthYear  ? m.birthYear            : '';
+    var fw = (m.level==='순장'||m.level==='간사님'||m.level==='간사님직속') ? '600' : 'normal';
+
+    var yearPart  = m.studentYear ? m.studentYear+'학번' : '';
+    var birthPart = m.birthYear   ? m.birthYear           : '';
     var deptShort = m.dept ? m.dept.replace(/학과$|학부$|전공$/, '') : '';
     var topLine   = [yearPart, birthPart, deptShort].filter(Boolean).join(' / ');
+
     var sid = escJs(id);
-    var cx = nx + NW/2;
-    nodes += '<g style="cursor:pointer" onmouseenter="showTip(event,\'' + sid + '\')" onmouseleave="hideTip()">'
-      + '<rect x="' + nx + '" y="' + ny + '" width="' + NW + '" height="' + NH + '"'
-      + ' rx="5" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + sw + '"/>'
-      // 1번째 줄: 학번 / 출생년도 (작게, 흐리게)
-      + '<text x="' + cx + '" y="' + (ny+14) + '"'
-      + ' text-anchor="middle" font-size="9.5" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif"'
-      + ' fill="' + tc + '" opacity="0.7">' + esc(topLine) + '</text>'
-      // 2번째 줄: 이름 (굵게)
-      + '<text x="' + cx + '" y="' + (ny+29) + '"'
-      + ' text-anchor="middle" font-size="12" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif"'
-      + ' fill="' + tc + '" font-weight="bold">'
-      + '<tspan font-size="9" fill="' + gColor + '" dy="0">' + (m.gender==='M'?'♂':'♀') + ' </tspan>'
-      + '<tspan font-size="11">' + esc(m.name) + '</tspan>'
+    nodes += '<g style="cursor:pointer" onmouseenter="showTip(event,\''+sid+'\')" onmouseleave="hideTip()">'
+      + '<rect x="'+nx+'" y="'+ny+'" width="'+NW+'" height="'+NH+'" rx="5" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw+'"/>'
+      + '<text x="'+cx2+'" y="'+(ny+14)+'" text-anchor="middle" font-size="9.5" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif" fill="'+tc+'" opacity="'+(m.level==='간사님'?'0.85':'0.7')+'">'+esc(topLine)+'</text>'
+      + '<text x="'+cx2+'" y="'+(ny+29)+'" text-anchor="middle" font-size="12" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif" fill="'+tc+'" font-weight="'+fw+'">'
+      + '<tspan font-size="9" fill="'+gColor+'">'+(m.gender==='M'?'♂':m.gender==='F'?'♀':'◇')+' </tspan>'
+      + '<tspan>'+esc(m.name)+'</tspan>'
       + '</text>'
       + '</g>';
   });
 
-  return '<svg width="' + Math.ceil(svgW) + '" height="' + Math.ceil(svgH) + '" xmlns="http://www.w3.org/2000/svg">'
-       + edges + nodes + '</svg>';
+  return '<svg width="'+Math.ceil(svgW)+'" height="'+Math.ceil(svgH)+'" xmlns="http://www.w3.org/2000/svg">'+edges+nodes+'</svg>';
 }
 
 var sectionIdx = 0;
@@ -528,28 +548,26 @@ function render() {
   externalRoots.forEach(function(root) {
     var kids = getKids(root);
     if (!kids.length) return;
-    var sid = 'sec-' + (sectionIdx++);
+    var sid = 'sec-'+(sectionIdx++);
     var safeRoot = escJs(root);
     html += '<div style="margin-bottom:28px">'
       + '<div class="save-row">'
-      + '<div class="root-lbl">⛪ ' + esc(root) + ' <span style="font-size:.72rem;opacity:.75">(' + kids.length + '명의 직속 순장)</span></div>'
-      + '<button class="btn-save" onclick="saveImg(\'' + sid + '\',\'' + safeRoot + '\')">📷 이미지 저장</button>'
+      + '<button class="btn-save" onclick="saveImg(\''+sid+'\',\''+safeRoot+'\')">📷 이미지 저장</button>'
       + '</div>'
-      + '<div class="svg-scroll" id="wrap-' + sid + '"><div class="svg-inner" id="' + sid + '">'
+      + '<div class="svg-scroll" id="wrap-'+sid+'"><div class="svg-inner" id="'+sid+'">'
       + buildMindMap(root, kids)
       + '</div></div></div>';
   });
 
   // 부모 미지정
-  var orphans = allMembers.filter(function(m) { return !m.parent; }).map(function(m) { return m.id; });
+  var orphans = allMembers.filter(function(m){ return !m.parent; }).map(function(m){ return m.id; });
   if (orphans.length) {
-    var sid = 'sec-' + (sectionIdx++);
+    var sid = 'sec-'+(sectionIdx++);
     html += '<div style="margin-bottom:28px">'
-      + '<div class="save-row">'
-      + '<div class="root-lbl" style="background:linear-gradient(90deg,#4a5568,#718096)">👤 부모 미지정 <span style="font-size:.72rem;opacity:.75">(' + orphans.length + '명)</span></div>'
-      + '<button class="btn-save" onclick="saveImg(\'' + sid + '\',\'부모미지정\')">📷 이미지 저장</button>'
+      + '<div class="save-row"><span style="font-size:.82rem;color:#718096">👤 부모 미지정 ('+orphans.length+'명)</span>'
+      + '<button class="btn-save" onclick="saveImg(\''+sid+'\',\'부모미지정\')">📷 이미지 저장</button>'
       + '</div>'
-      + '<div class="svg-scroll" id="wrap-' + sid + '"><div class="svg-inner" id="' + sid + '">'
+      + '<div class="svg-scroll" id="wrap-'+sid+'"><div class="svg-inner" id="'+sid+'">'
       + buildMindMap(null, orphans)
       + '</div></div></div>';
   }
@@ -562,69 +580,61 @@ function render() {
 // ── 이미지 저장 ──
 function saveImg(sectionId, label) {
   var el = document.getElementById(sectionId);
-  var svg = el && el.querySelector('svg');
-  if (!svg) return;
+  var svg = el && el.querySelector('svg'); if (!svg) return;
   var svgData = new XMLSerializer().serializeToString(svg);
   var blob = new Blob([svgData], {type:'image/svg+xml;charset=utf-8'});
   var url = URL.createObjectURL(blob);
   var img = new Image();
   img.onload = function() {
-    var SCALE = 2;
-    var canvas = document.createElement('canvas');
-    canvas.width  = img.width  * SCALE;
-    canvas.height = img.height * SCALE;
-    var ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.scale(SCALE, SCALE);
-    ctx.drawImage(img, 0, 0);
+    var S=2, canvas=document.createElement('canvas');
+    canvas.width=img.width*S; canvas.height=img.height*S;
+    var ctx=canvas.getContext('2d');
+    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.scale(S,S); ctx.drawImage(img,0,0);
     URL.revokeObjectURL(url);
-    canvas.toBlob(function(b) {
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(b);
-      a.download = 'CCC_순계보_' + label + '.png';
-      a.click();
-      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 3000);
-    }, 'image/png');
+    canvas.toBlob(function(b){
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(b); a.download='CCC_순계보_'+label+'.png'; a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);},3000);
+    },'image/png');
   };
   img.onerror = function() {
     URL.revokeObjectURL(url);
-    var a = document.createElement('a');
-    a.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
-    a.download = 'CCC_순계보_' + label + '.svg';
-    a.click();
+    var a=document.createElement('a');
+    a.href='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgData);
+    a.download='CCC_순계보_'+label+'.svg'; a.click();
   };
-  img.src = url;
+  img.src=url;
 }
 
 // ── 툴팁 ──
 var tip = document.getElementById('tooltip');
 function showTip(e, id) {
   var m = memberMap[id]; if (!m) return;
-  var nc = m.gender === 'M' ? '#1d4ed8' : '#be185d';
-  var kids = (childrenMap[id] || []).length;
-  var html = '<div class="tt-name" style="color:' + nc + '">' + m.name
-    + (m.sabbatical ? ' <span style="color:#c53030;font-size:.72rem">(휴학)</span>' : '') + '</div>'
-    + '<div class="tt-row">구분: <span>' + m.level + '</span></div>'
-    + '<div class="tt-row">학번: <span>' + (m.studentYear || '-') + '학번</span></div>'
-    + '<div class="tt-row">학과: <span>' + (m.dept || '-') + '</span></div>';
-  if (m.activity) html += '<div class="tt-row">활동: <span>' + m.activity + '</span></div>';
-  if (kids)       html += '<div class="tt-row">순원: <span>' + kids + '명</span></div>';
-  if (m.parent)   html += '<div class="tt-row">부모순장: <span>' + m.parent + '</span></div>';
+  var nc = m.level==='간사님' ? '#1e3a7a' : m.level==='간사님직속' ? '#6d28d9' : m.gender==='M' ? '#1d4ed8' : '#be185d';
+  var kids = (childrenMap[id]||[]).length;
+  var html = '<div class="tt-name" style="color:'+nc+'">'+m.name
+    +(m.sabbatical?' <span style="color:#c53030;font-size:.72rem">(휴학)</span>':'')+'</div>'
+    +'<div class="tt-row">구분: <span>'+m.level+'</span></div>';
+  if (m.studentYear) html += '<div class="tt-row">학번: <span>'+m.studentYear+'학번</span></div>';
+  if (m.birthYear)   html += '<div class="tt-row">출생: <span>'+m.birthYear+'년생</span></div>';
+  if (m.dept)        html += '<div class="tt-row">학과: <span>'+m.dept+'</span></div>';
+  if (m.activity)    html += '<div class="tt-row">활동: <span>'+m.activity+'</span></div>';
+  if (kids)          html += '<div class="tt-row">직속: <span>'+kids+'명</span></div>';
+  if (m.parent)      html += '<div class="tt-row">부모: <span>'+m.parent+'</span></div>';
   tip.innerHTML = html;
-  moveTip(e);
-  tip.classList.add('show');
+  moveTip(e); tip.classList.add('show');
 }
 function moveTip(e) {
-  var x = e.clientX + 14, y = e.clientY - 10;
-  tip.style.left = (x + 220 > window.innerWidth ? e.clientX - 224 : x) + 'px';
-  tip.style.top  = (y + 140 > window.innerHeight ? e.clientY - 144 : y) + 'px';
+  var x=e.clientX+14, y=e.clientY-10;
+  tip.style.left=(x+230>window.innerWidth?e.clientX-234:x)+'px';
+  tip.style.top=(y+150>window.innerHeight?e.clientY-154:y)+'px';
 }
 function hideTip() { tip.classList.remove('show'); }
-document.addEventListener('mousemove', function(e) {
-  if (tip.classList.contains('show')) moveTip(e);
-});
+document.addEventListener('mousemove',function(e){ if(tip.classList.contains('show')) moveTip(e); });
 
+// ── 시작 ──
+setView('unified');  // 탭 초기 스타일 적용
 loadData();
 </script>
 </body>
