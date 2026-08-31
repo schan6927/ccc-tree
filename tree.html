@@ -180,6 +180,7 @@ var HARDCODED_URL    = 'https://docs.google.com/spreadsheets/d/1Kz_dVaMGFgaHZmoq
 var SHEET_BROTHERS   = '형제 리스트';   // 형제 시트 이름
 var SHEET_SISTERS    = '자매 리스트';   // 자매 시트 이름
 var SHEET_STAFF      = '간사님 직속';   // 간사님 직속 시트 이름
+var STAFF_ROOT_NAME  = '이종태 간사님'; // 간사님 직속 시트의 최상위 부모 (부모 미설정 시 자동 연결)
 // ──────────────────────────────────────────────────────
 
 const STORAGE_KEY = 'ccc_sheet_config_v2';
@@ -290,6 +291,20 @@ function parseSheet(table, sheetName) {
   var autoGender = sheetName.indexOf('형제') >= 0 ? 'M' : sheetName.indexOf('자매') >= 0 ? 'F' : '';
   var isStaff = sheetName === SHEET_STAFF;
   var cols = table.cols.map(function(c) { return c.label.trim(); });
+  var rows = table.rows;
+  var startRow = 0;
+
+  // 컬럼 라벨이 없는 시트(간사님 직속 등)는 첫 번째 데이터 행을 헤더로 사용
+  if (cols.every(function(c) { return !c; }) && rows.length > 0) {
+    var firstRow = rows[0];
+    if (firstRow && firstRow.c) {
+      cols = firstRow.c.map(function(cell) {
+        return cell && cell.v ? String(cell.v).trim() : '';
+      });
+    }
+    startRow = 1;
+  }
+
   var idx = function(n) { return cols.indexOf(n); };
   var C = {
     name: idx('이름'), parent: idx('부모 순장'), dept: idx('학과'),
@@ -314,11 +329,15 @@ function parseSheet(table, sheetName) {
     return f === 0 ? String(i) : (i + '.' + f);
   }
   var members = [];
-  table.rows.forEach(function(row) {
+  rows.slice(startRow).forEach(function(row) {
     var name = cell(row, C.name).trim();
     if (!name) return;
     var cleanN = name.replace(/\d+$/, '').trim();
-    var parentRaw = cell(row, C.parent).trim().replace(/\d+$/, '').trim();
+    var parentRaw = C.parent >= 0 ? cell(row, C.parent).trim().replace(/\d+$/, '').trim() : '';
+    // 간사님 직속 멤버는 부모가 없으면 STAFF_ROOT_NAME(이종태 간사님)으로 자동 연결
+    if (isStaff && !parentRaw) parentRaw = STAFF_ROOT_NAME;
+    // 부모 순장 칸의 이름도 trailing 숫자 제거 (이미 위에서 했지만 공백 정리)
+    parentRaw = parentRaw.trim();
     var sabbVal = (row.c && row.c[C.sabbatical]) ? row.c[C.sabbatical].v : null;
     var genderCell = C.gender >= 0 ? cell(row, C.gender).trim() : '';
     var gender = genderCell === '남' || genderCell === 'M' ? 'M'
@@ -329,8 +348,14 @@ function parseSheet(table, sheetName) {
     var birthRaw = C.birth >= 0 ? cell(row, C.birth).trim() : '';
     var birthYear = birthRaw || (yearNum ? String((Math.floor(yearNum) + 1981) % 100).padStart(2,'0') : '');
     var levelRaw = cell(row, C.level);
-    // 간사님 직속 시트: 순원 여부 칸을 그대로 사용, 없으면 '간사님직속'
-    var level = isStaff ? (levelRaw || '간사님직속') : (levelRaw || '순원');
+    // 간사님 직속 시트: '간사' → '간사님'으로 정규화, 없으면 '간사님직속'
+    var level;
+    if (isStaff) {
+      level = (levelRaw === '간사' || levelRaw === '간사님') ? '간사님'
+            : levelRaw ? levelRaw : '간사님직속';
+    } else {
+      level = levelRaw || '순원';
+    }
     members.push({
       id: cleanN || name, rawName: name, name: cleanN || name,
       dept: cell(row, C.dept), grade: cell(row, C.grade),
@@ -362,19 +387,37 @@ function buildAndRender() {
   render();
 }
 
+// 이름 정규화: "김영민 간사님" → "김영민" (부모 이름 매핑용)
+function normName(n) {
+  return String(n).replace(/\s*(간사님|집사님|목사님|전도사님)\s*$/, '').trim();
+}
+
 function build() {
   memberMap = {}; childrenMap = {}; externalRoots = [];
   var cnt = {};
   allMembers.forEach(function(m) { cnt[m.id] = (cnt[m.id] || 0) + 1; });
   allMembers.forEach(function(m) { if (cnt[m.id] > 1) { m.id = m.rawName; m.name = m.rawName; } });
   allMembers.forEach(function(m) { memberMap[m.id] = m; });
+
+  // 정규화 이름 → 실제 id 역매핑 (예: "김영민" → "김영민", "김영민 간사님" 입력도 "김영민"으로 해석)
+  var normToId = {};
+  Object.keys(memberMap).forEach(function(id) {
+    normToId[id] = id;
+    normToId[normName(id)] = id;
+  });
+
   var allParents = {};
   allMembers.forEach(function(m) {
     if (!m.parent) return;
-    allParents[m.parent] = true;
-    if (!childrenMap[m.parent]) childrenMap[m.parent] = [];
-    childrenMap[m.parent].push(m.id);
+    // 부모 이름을 실제 멤버 id로 해석 (exact → normalized 순서)
+    var resolvedP = (normToId[m.parent] !== undefined) ? normToId[m.parent]
+                  : (normToId[normName(m.parent)] !== undefined) ? normToId[normName(m.parent)]
+                  : m.parent;
+    allParents[resolvedP] = true;
+    if (!childrenMap[resolvedP]) childrenMap[resolvedP] = [];
+    childrenMap[resolvedP].push(m.id);
   });
+
   var mSet = {};
   Object.keys(memberMap).forEach(function(k) { mSet[k] = true; });
   externalRoots = Object.keys(allParents).filter(function(p) { return !mSet[p]; }).sort();
@@ -486,12 +529,17 @@ function buildMindMap(rootId, topKids) {
     });
   });
 
-  // 루트 노드 (총간사님)
+  // 루트 노드 (총간사님 / 이종태 간사님)
   if (rootId) {
     var rnx = -ROOT_W/2+offX, rny = -ROOT_H/2+offY;
+    // 이름이 길면 두 줄로 (예: "이종태 간사님" → "이종태" + "간사님")
+    var rParts = rootId.length > 5 ? [rootId.replace(/\s*(간사님|직속).*$/, '').trim(), rootId.replace(/^.*?(\s*(간사님.*))$/, '$2').trim()] : [rootId, ''];
+    var rLine1 = rParts[0] || rootId, rLine2 = rParts[1] || '';
+    var rH2 = rLine2 ? ROOT_H + 12 : ROOT_H;
     nodes += '<g>'
-      + '<rect x="'+rnx+'" y="'+rny+'" width="'+ROOT_W+'" height="'+ROOT_H+'" rx="9" fill="#0f2744" stroke="#0f2744"/>'
-      + '<text x="'+(rnx+ROOT_W/2)+'" y="'+(rny+ROOT_H/2+5)+'" text-anchor="middle" font-size="13" font-weight="bold" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif" fill="white">'+esc(rootId)+'</text>'
+      + '<rect x="'+rnx+'" y="'+rny+'" width="'+ROOT_W+'" height="'+rH2+'" rx="9" fill="#0f2744" stroke="#0f2744"/>'
+      + '<text x="'+(rnx+ROOT_W/2)+'" y="'+(rny + (rLine2 ? ROOT_H/2-1 : ROOT_H/2+5))+'" text-anchor="middle" font-size="13" font-weight="bold" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif" fill="white">'+esc(rLine1)+'</text>'
+      + (rLine2 ? '<text x="'+(rnx+ROOT_W/2)+'" y="'+(rny+ROOT_H/2+13)+'" text-anchor="middle" font-size="11" font-family="Apple SD Gothic Neo,Malgun Gothic,sans-serif" fill="rgba(255,255,255,0.75)">'+esc(rLine2)+'</text>' : '')
       + '</g>';
   }
 
@@ -545,6 +593,15 @@ function render() {
   var html = '';
   sectionIdx = 0;
 
+  // ── 간사님 직속 뷰: 데이터 없을 때 안내 ──
+  if (currentView === 'staff' && !allMembers.length) {
+    main.innerHTML = '<p style="text-align:center;color:#a0aec0;padding:80px 20px;line-height:2">'
+      + '간사님 직속 시트에 데이터가 아직 없어요.<br>'
+      + '<small>시트 이름이 <strong>간사님 직속</strong>인지, 데이터가 입력됐는지 확인해 주세요.</small></p>';
+    return;
+  }
+
+  // ── 트리 있는 멤버 (external root 기준) ──
   externalRoots.forEach(function(root) {
     var kids = getKids(root);
     if (!kids.length) return;
@@ -559,16 +616,22 @@ function render() {
       + '</div></div></div>';
   });
 
-  // 부모 미지정
+  // ── 부모 미지정 멤버 ──
   var orphans = allMembers.filter(function(m){ return !m.parent; }).map(function(m){ return m.id; });
   if (orphans.length) {
     var sid = 'sec-'+(sectionIdx++);
+    // 간사님 직속 뷰에서 고아는 "이종태 간사님" 직속으로 묶어 표시
+    var isStaffView = (currentView === 'staff');
+    var rootLabel = isStaffView ? '이종태 간사님' : null;
+    var saveLabel = isStaffView ? '이종태간사님직속' : '부모미지정';
+    var headerHtml = isStaffView
+      ? '<button class="btn-save" onclick="saveImg(\''+sid+'\',\''+saveLabel+'\')">📷 이미지 저장</button>'
+      : '<span style="font-size:.82rem;color:#718096">👤 부모 미지정 ('+orphans.length+'명)</span>'
+        + '<button class="btn-save" onclick="saveImg(\''+sid+'\',\''+saveLabel+'\')">📷 이미지 저장</button>';
     html += '<div style="margin-bottom:28px">'
-      + '<div class="save-row"><span style="font-size:.82rem;color:#718096">👤 부모 미지정 ('+orphans.length+'명)</span>'
-      + '<button class="btn-save" onclick="saveImg(\''+sid+'\',\'부모미지정\')">📷 이미지 저장</button>'
-      + '</div>'
+      + '<div class="save-row">'+headerHtml+'</div>'
       + '<div class="svg-scroll" id="wrap-'+sid+'"><div class="svg-inner" id="'+sid+'">'
-      + buildMindMap(null, orphans)
+      + buildMindMap(rootLabel, orphans)
       + '</div></div></div>';
   }
 
