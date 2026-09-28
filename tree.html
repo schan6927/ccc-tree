@@ -192,7 +192,7 @@ const ZOOM_STEPS = [30,40,50,60,70,80,90,100,110,125,150,175,200];
 var sourceData = {}; // { 'brothers': [...], 'sisters': [...], 'staff': [...] }
 
 // 현재 뷰 데이터
-var memberMap = {}, childrenMap = {}, externalRoots = [], allMembers = [];
+var memberMap = {}, childrenMap = {}, externalRoots = [], allMembers = [], inactiveMembers = [];
 
 // ── 줌 ──
 function zoom(dir) {
@@ -310,7 +310,7 @@ function parseSheet(table, sheetName) {
     name: idx('이름'), parent: idx('부모 순장'), dept: idx('학과'),
     grade: idx('학년'), year: idx('학번'), phone: idx('전화번호'),
     level: idx('순원 여부'), activity: idx('활동 정도'), sabbatical: idx('휴학 여부'),
-    gender: idx('성별'), birth: idx('출생년도'),
+    gender: idx('성별'), birth: idx('출생년도'), inactive: idx('활동 불가 여부'),
   };
   function cell(row, ci) {
     if (ci < 0 || !row.c || !row.c[ci]) return '';
@@ -365,6 +365,7 @@ function parseSheet(table, sheetName) {
       level: level,
       activity: cell(row, C.activity),
       sabbatical: sabbVal === true || String(sabbVal).toLowerCase() === 'true',
+      inactive: (row.c && row.c[C.inactive]) ? row.c[C.inactive].v === true : false,
       parent: parentRaw || null,
       isStaff: isStaff,
     });
@@ -374,15 +375,18 @@ function parseSheet(table, sheetName) {
 
 // ── 뷰 전환 ──
 function buildAndRender() {
+  var pool;
   if (currentView === 'unified') {
-    allMembers = [].concat(sourceData.staff || [], sourceData.brothers || [], sourceData.sisters || []);
+    pool = [].concat(sourceData.staff || [], sourceData.brothers || [], sourceData.sisters || []);
   } else if (currentView === 'brothers') {
-    allMembers = sourceData.brothers || [];
+    pool = sourceData.brothers || [];
   } else if (currentView === 'sisters') {
-    allMembers = sourceData.sisters || [];
+    pool = sourceData.sisters || [];
   } else { // staff
-    allMembers = sourceData.staff || [];
+    pool = sourceData.staff || [];
   }
+  inactiveMembers = pool.filter(function(m) { return m.inactive; });
+  allMembers      = pool.filter(function(m) { return !m.inactive; });
   build();
   render();
 }
@@ -633,6 +637,28 @@ function render() {
       + '<div class="svg-scroll" id="wrap-'+sid+'"><div class="svg-inner" id="'+sid+'">'
       + buildMindMap(rootLabel, orphans)
       + '</div></div></div>';
+  }
+
+  // ── 활동 불가 섹션 ──
+  if (inactiveMembers.length) {
+    html += '<div style="margin-top:8px;border-top:2px dashed #fed7d7;padding-top:20px">'
+      + '<div style="font-size:.84rem;color:#c53030;font-weight:700;margin-bottom:12px">🚫 활동 불가 ('
+      + inactiveMembers.length + '명)</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+    inactiveMembers.forEach(function(m) {
+      var bg   = m.gender==='M' ? '#f0f9ff' : m.gender==='F' ? '#fdf4ff' : '#f7fafc';
+      var tc   = m.gender==='M' ? '#075985' : m.gender==='F' ? '#6b21a8' : '#4a5568';
+      var bdr  = m.gender==='M' ? '#bae6fd' : m.gender==='F' ? '#e9d5ff' : '#e2e8f0';
+      var glyph = m.gender==='M' ? '♂' : m.gender==='F' ? '♀' : '◇';
+      var sub  = [m.level, m.parent ? '↑' + m.parent : ''].filter(Boolean).join(' · ');
+      html += '<div style="background:'+bg+';border:1px solid '+bdr+';border-radius:8px;'
+        + 'padding:6px 12px;font-size:.8rem;color:'+tc+';opacity:0.72">'
+        + '<div style="font-weight:600"><span style="font-size:.75rem;opacity:.65">'+glyph+' </span>'
+        + esc(m.name) + (m.sabbatical ? ' <span style="color:#c53030;font-size:.7rem">(휴학)</span>' : '') + '</div>'
+        + (sub ? '<div style="font-size:.71rem;opacity:.6;margin-top:1px">'+esc(sub)+'</div>' : '')
+        + '</div>';
+    });
+    html += '</div></div>';
   }
 
   if (!html) html = '<p style="text-align:center;color:#a0aec0;padding:60px">데이터가 없어요.</p>';
